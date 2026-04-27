@@ -3,13 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>CubeBeat Pro</title>
-    
-    <link rel="apple-touch-icon" href="icon.png">
-    <link rel="icon" type="image/png" href="icon.png">
-    
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>CubeBeat</title>
     
     <style>
         :root {
@@ -17,7 +11,6 @@
             --surface: #1e1e1e;
             --text: #e0e0e0;
             --accent-go: #00ff88;
-            --accent-listen: #00a2ff;
             --danger: #ff4444;
         }
 
@@ -33,285 +26,233 @@
             margin: 0;
             overflow: hidden;
             touch-action: manipulation;
+            transition: background-color 0.05s;
         }
 
-        .flash-go { background-color: #00331b !important; }
-        .flash-listen { background-color: #001f33 !important; }
+        .flash-strong { background-color: #004425 !important; }
+        .flash-weak { background-color: #252525 !important; }
 
-        .container { width: 90%; max-width: 450px; text-align: center; }
+        .container { width: 90%; max-width: 450px; text-align: center; z-index: 10; display: flex; flex-direction: column; height: 92vh; justify-content: space-between; }
 
-        .bpm-display { font-size: 7.5rem; font-weight: 900; margin: 0; color: white; line-height: 1; }
-        .tps-sub { font-size: 1.4rem; color: #888; margin-bottom: 20px; }
-        .active-algo-name { font-weight: bold; color: var(--accent-listen); margin-bottom: 25px; font-size: 1.4rem; min-height: 1.4em; }
+        .metronome-box { flex-grow: 1; display: flex; flex-direction: column; justify-content: center; }
+        .bpm-display { font-size: 8rem; font-weight: 900; margin: 0; color: white; line-height: 1; }
+        .tps-sub { font-size: 1.4rem; color: #888; margin-bottom: 30px; }
 
-        .bpm-stepper { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
-        .step-btn, .tap-btn { background: #2a2a2a; border: 1px solid #444; color: white; padding: 18px 5px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; }
-        .tap-btn { grid-column: span 4; color: var(--accent-listen); margin-top: 5px; padding: 22px; text-transform: uppercase; letter-spacing: 1px; }
+        .bpm-stepper { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 25px; }
+        .step-btn { background: #2a2a2a; border: 1px solid #444; color: white; padding: 22px 5px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; }
 
-        .btn-main { width: 100%; background-color: var(--accent-go); color: black; font-size: 1.8rem; border: none; padding: 22px; border-radius: 18px; font-weight: 900; }
+        .btn-main { width: 100%; background-color: var(--accent-go); color: black; font-size: 2rem; border: none; padding: 25px; border-radius: 20px; font-weight: 900; }
         .btn-stop { background-color: var(--danger); color: white; }
 
-        .secondary-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
-        .sec-btn { background: #2a2a2a; border: 1px solid #444; color: white; padding: 15px; border-radius: 12px; font-size: 0.95rem; font-weight: 600; }
+        .dashboard-footer { border-top: 1px solid #333; padding-top: 15px; margin-top: 10px; padding-bottom: 10px; }
+        .monitor-line { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 0.95rem; }
+        .monitor-label { color: #888; font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; font-weight: bold; }
+        .monitor-focus { color: var(--accent-go); font-weight: 800; font-size: 1rem; }
+        .monitor-count { color: #666; font-family: monospace; font-size: 0.85rem; }
 
-        /* Library Overlay Improvements */
+        .secondary-btns { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; margin-top: 15px; }
+        .sec-btn { background: #2a2a2a; border: 1px solid #444; color: white; padding: 12px 5px; border-radius: 10px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; }
+        .active-toggle { border-color: var(--accent-go); color: var(--accent-go); background: #15251c; }
+
         #libraryOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg); z-index: 100; display: none;
             flex-direction: column; padding: 25px; box-sizing: border-box;
         }
-        .lib-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
-        .close-lib-btn { background: #2a2a2a; border: 1px solid var(--danger); color: var(--danger); padding: 10px 15px; border-radius: 10px; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+        .lib-nav { display: flex; gap: 10px; margin-bottom: 20px; }
+        select { flex-grow: 1; background: #2a2a2a; color: white; border: 1px solid #444; border-radius: 10px; padding: 12px; font-size: 1.1rem; appearance: none; }
         
-        .filter-row { display: flex; gap: 12px; margin-bottom: 20px; }
-        select { 
-            flex: 1; padding: 18px; background: #2a2a2a; border: 1px solid #444; 
-            border-radius: 12px; color: white; font-size: 1.1rem; appearance: none;
-            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
-            background-repeat: no-repeat; background-position: right 15px center; background-size: 15px;
-        }
-
-        .lib-list { flex-grow: 1; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 40px;}
-        .lib-item { background: #2a2a2a; padding: 22px 15px; border-radius: 14px; text-align: left; border: 1px solid #333; }
-        .lib-item:active { background: #333; border-color: var(--accent-listen); }
-        .lib-item strong { display: block; font-size: 1.1rem; color: white; }
-        .lib-item small { display: block; color: #777; margin-top: 8px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; }
-
-        .stats-bar { display: flex; justify-content: space-around; background: #1a1a1a; padding: 12px; border-radius: 12px; margin-top: 25px; font-size: 0.85rem; color: #888; border: 1px solid #222; }
-
-        button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
-        button:active { transform: scale(0.96); }
+        .lib-list { flex-grow: 1; overflow-y: auto; }
+        .lib-divider { padding: 20px 5px 8px; font-size: 0.8rem; color: var(--accent-go); font-weight: 900; text-transform: uppercase; border-bottom: 1px solid #333; }
+        .lib-item { background: #1e1e1e; padding: 18px; border-radius: 12px; margin-top: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #333; }
+        .lib-item.practised { border-color: var(--accent-go); background: #15251c; }
+        
+        .tick-box { width: 30px; height: 30px; border: 2px solid #444; border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--accent-go); font-size: 1.2rem; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="statusPill" style="display:none; padding: 6px 18px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-bottom: 12px;">LISTEN</div>
-    <div class="active-algo-name" id="currentAlgoDisplay">Ready to Drill</div>
-    <div class="bpm-display" id="bpmDisplay">30</div>
-    <div class="tps-sub" id="tpsDisplay">0.50 TPS</div>
+    <div class="metronome-box">
+        <div class="bpm-display" id="bpmDisplay">30</div>
+        <div class="tps-sub" id="tpsDisplay">0.50 TPS</div>
 
-    <div class="bpm-stepper">
-        <button class="step-btn" onclick="adjustBPM(-5)">-5</button>
-        <button class="step-btn" onclick="adjustBPM(-1)">-1</button>
-        <button class="step-btn" onclick="adjustBPM(1)">+1</button>
-        <button class="step-btn" onclick="adjustBPM(5)">+5</button>
-        <button class="tap-btn" id="tapBtn">TAP TEMPO</button>
+        <div class="bpm-stepper">
+            <button class="step-btn" onclick="adjustBPM(-5)">-5</button>
+            <button class="step-btn" onclick="adjustBPM(-1)">-1</button>
+            <button class="step-btn" onclick="adjustBPM(1)">+1</button>
+            <button class="step-btn" onclick="adjustBPM(5)">+5</button>
+        </div>
+
+        <button id="startBtn" class="btn-main">START</button>
     </div>
 
-    <button id="startBtn" class="btn-main">START</button>
-
-    <div class="secondary-btns">
-        <button class="sec-btn" onclick="toggleLibrary()">📚 LIBRARY</button>
-        <button class="sec-btn" onclick="saveMilestone()">⭐ SAVE PB</button>
-    </div>
-
-    <div class="stats-bar">
-        <span id="sessionCount">Session: 0 saved</span>
-        <span id="bestBpm">Best: -- BPM</span>
+    <div class="dashboard-footer">
+        <div class="monitor-line">
+            <span class="monitor-label">OLL Focus</span>
+            <span class="monitor-focus" id="ollFocus">Ready</span>
+            <span class="monitor-count" id="ollProgress">0 / 57</span>
+        </div>
+        <div class="monitor-line">
+            <span class="monitor-label">PLL Focus</span>
+            <span class="monitor-focus" id="pllFocus">Ready</span>
+            <span class="monitor-count" id="pllProgress">0 / 21</span>
+        </div>
+        
+        <div class="secondary-btns">
+            <button class="sec-btn" onclick="toggleLibrary()">📚 Library</button>
+            <button id="flashToggle" class="sec-btn active-toggle" onclick="toggleFlash()">✨ Flash</button>
+            <button id="rampToggle" class="sec-btn" onclick="toggleRamp()">📈 Ramp</button>
+        </div>
     </div>
 </div>
 
 <div id="libraryOverlay">
-    <div class="lib-header">
-        <h2 style="margin:0">Drill Library</h2>
-        <button class="close-lib-btn" onclick="toggleLibrary()">
-            <span>✕</span> BACK
-        </button>
-    </div>
-    
-    <div class="filter-row">
-        <select id="typeSelect" onchange="updateGroupOptions()">
-            <option value="OLL">OLL Cases</option>
-            <option value="PLL">PLL Cases</option>
+    <div class="lib-nav">
+        <select id="libFilter" onchange="renderLibrary()">
+            <option value="ALL">Show All</option>
+            <option value="OLL">OLL Only</option>
+            <option value="PLL">PLL Only</option>
         </select>
-        <select id="groupSelect" onchange="renderLibrary()">
-        </select>
+        <button class="sec-btn" style="border-color: var(--danger); width: 60px;" onclick="toggleLibrary()">✕</button>
     </div>
-    
     <div class="lib-list" id="libList"></div>
 </div>
 
 <script>
     let audioCtx = null, nextNoteTime = 0.0, timerID = null, isPlaying = false;
-    let currentBeat = 0, currentBar = 0, bpm = 30, currentAlgo = "None";
-    let tapTimes = [], sessionSaves = 0;
+    let currentBeat = 0, bpm = 30, visualFlash = true, rampActive = false;
+    let practised = JSON.parse(localStorage.getItem('cubePractised')) || [];
 
-    const pllAlgos = [
-        { name: 'Aa', group: 'Adjacent' }, { name: 'Ab', group: 'Adjacent' }, 
-        { name: 'E', group: 'Corners Only' }, { name: 'F', group: 'Adjacent' },
-        { name: 'Ga', group: 'G-Perms' }, { name: 'Gb', group: 'G-Perms' }, 
-        { name: 'Gc', group: 'G-Perms' }, { name: 'Gd', group: 'G-Perms' },
-        { name: 'H', group: 'Edges Only' }, { name: 'Ja', group: 'Adjacent' }, 
-        { name: 'Jb', group: 'Adjacent' }, { name: 'Na', group: 'Adjacent' }, 
-        { name: 'Nb', group: 'Adjacent' }, { name: 'Ra', group: 'Adjacent' }, 
-        { name: 'Rb', group: 'Adjacent' }, { name: 'T', group: 'Adjacent' },
-        { name: 'Ua', group: 'Edges Only' }, { name: 'Ub', group: 'Edges Only' }, 
-        { name: 'V', group: 'Adjacent' }, { name: 'Y', group: 'Adjacent' }, 
-        { name: 'Z', group: 'Edges Only' }
-    ];
+    const pllAlgos = [{ n: 'Aa', g: 'Adj' }, { n: 'Ab', g: 'Adj' }, { n: 'E', g: 'Corn' }, { n: 'F', g: 'Adj' }, { n: 'Ga', g: 'G' }, { n: 'Gb', g: 'G' }, { n: 'Gc', g: 'G' }, { n: 'Gd', g: 'G' }, { n: 'H', g: 'Edge' }, { n: 'Ja', g: 'Adj' }, { n: 'Jb', g: 'Adj' }, { n: 'Na', g: 'Adj' }, { n: 'Nb', g: 'Adj' }, { n: 'Ra', g: 'Adj' }, { n: 'Rb', g: 'Adj' }, { n: 'T', g: 'Adj' }, { n: 'Ua', g: 'Edge' }, { n: 'Ub', g: 'Edge' }, { n: 'V', g: 'Adj' }, { n: 'Y', g: 'Adj' }, { n: 'Z', g: 'Edge' }];
+    const ollSet = ["T", "P", "Breakneck", "Seein' Headlights", "Key", "Ant", "Mounted Fish", "Big Lightning", "Sune", "Anti-Sune", "Cross", "Chameleon", "Bowtie", "Bruno", "Headlights", "Arrow", "H", "Lightning", "Downstairs", "Couch", "Upstairs", "Poodle", "WTF", "Anti-Poodle", "Anti-WTF", "Blank", "Slash", "Bunny", "Anti-Nazi", "Zamboni", "Crown", "X", "Fish Salad", "Frying Pan", "Front Squeezy", "Kite", "Anti-Kite", "Anti-Breakneck", "Anti-Frying Pan", "Back Squeezy", "Mario", "Wario", "Rice Cooker", "Streetlights", "Squeegee", "Gun", "Highway", "Anti-Squeegee", "Anti-Gun", "Righty-Square", "Lefty-Square", "Lefty Big Lightning", "Inverse P", "Anti-Couch", "City", "Poodle", "Slash"];
 
-    const ollGroups = {
-        "Easy Algs": ["T", "P", "Breakneck", "Seein' Headlights", "Key", "Ant", "Mounted Fish", "Big Lightning"],
-        "Oriented-Edges": ["Sune", "Anti-Sune", "Cross", "Chameleon", "Bowtie", "Bruno", "Headlights"],
-        "T-shapes & Squares": ["T", "Righty-Square", "Lefty-Square"],
-        "Solved Corners": ["Arrow", "H", "Lightning", "Downstairs", "Big Lightning", "Reverse Lightning", "Upstairs", "Lefty Big Lightning"],
-        "P-shapes": ["P", "Couch", "Inverse P", "Anti-Couch"],
-        "C, Fish & L-shapes": ["Seein' Headlights", "City", "Mounted Fish", "Fish Salad", "Breakneck", "Frying Pan", "Front Squeezy", "Kite", "Anti-Kite", "Anti-Breakneck", "Anti-Frying Pan", "Back Squeezy"],
-        "W, Lines & Knights": ["Mario", "Wario", "Ant", "Rice Cooker", "Streetlights", "Squeegee", "Gun", "Highway", "Anti-Squeegee", "Anti-Gun"],
-        "Awkward & Dots": ["Poodle", "Anti-Poodle", "WTF", "Anti-WTF", "Blank", "Slash", "Bunny", "Nazi", "Anti-Nazi", "Zamboni", "Crown", "X"]
-    };
-
-    function updateGroupOptions() {
-        const type = document.getElementById('typeSelect').value;
-        const groupSelect = document.getElementById('groupSelect');
-        groupSelect.innerHTML = '<option value="All">Show All</option>';
-        
-        if (type === 'OLL') {
-            Object.keys(ollGroups).forEach(group => {
-                groupSelect.innerHTML += `<option value="${group}">${group}</option>`;
-            });
-        } else {
-            const pllGroups = [...new Set(pllAlgos.map(a => a.group))];
-            pllGroups.forEach(group => {
-                groupSelect.innerHTML += `<option value="${group}">${group}</option>`;
-            });
-        }
+    function togglePractised(name, event) {
+        event.stopPropagation();
+        practised = practised.includes(name) ? practised.filter(a => a !== name) : [...practised, name];
+        localStorage.setItem('cubePractised', JSON.stringify(practised));
         renderLibrary();
-    }
-
-    function renderLibrary() {
-        const list = document.getElementById('libList');
-        const type = document.getElementById('typeSelect').value;
-        const groupFilter = document.getElementById('groupSelect').value;
-        
-        let items = [];
-        if (type === 'PLL') {
-            items = pllAlgos.filter(a => (groupFilter === 'All' || a.group === groupFilter))
-                            .map(a => ({ name: 'PLL ' + a.name, category: a.group }));
-        } else {
-            if (groupFilter === 'All') {
-                Object.keys(ollGroups).forEach(group => {
-                    ollGroups[group].forEach(name => items.push({ name: 'OLL ' + name, category: group }));
-                });
-            } else {
-                ollGroups[groupFilter].forEach(name => items.push({ name: 'OLL ' + name, category: groupFilter }));
-            }
-        }
-
-        list.innerHTML = items.map(a => 
-            `<div class="lib-item" onclick="selectAlgo('${a.name}')">
-                <strong>${a.name}</strong>
-                <small>${a.category}</small>
-            </div>`
-        ).join('');
+        updateTally();
     }
 
     function selectAlgo(name) {
-        currentAlgo = name;
-        document.getElementById('currentAlgoDisplay').textContent = name;
-        toggleLibrary(); // This now explicitly hides the overlay
+        const [type, ...rest] = name.split(' ');
+        const cleanName = rest.join(' ');
+        document.getElementById(type.toLowerCase() + 'Focus').textContent = cleanName;
+        toggleLibrary();
     }
 
-    function toggleLibrary() {
-        const lib = document.getElementById('libraryOverlay');
-        if (lib.style.display === 'flex') {
-            lib.style.display = 'none';
-        } else {
-            lib.style.display = 'flex';
-            updateGroupOptions();
+    function updateTally() {
+        const ollCount = practised.filter(p => p.startsWith('OLL')).length;
+        const pllCount = practised.filter(p => p.startsWith('PLL')).length;
+        document.getElementById('ollProgress').textContent = `${ollCount} / 57`;
+        document.getElementById('pllProgress').textContent = `${pllCount} / 21`;
+    }
+
+    function renderLibrary() {
+        const filter = document.getElementById('libFilter').value;
+        const list = document.getElementById('libList');
+        let html = '';
+
+        if (filter === 'ALL' || filter === 'PLL') {
+            html += '<div class="lib-divider">PLL Cases</div>';
+            pllAlgos.forEach(a => {
+                const id = 'PLL ' + a.n;
+                const isDone = practised.includes(id);
+                html += `<div class="lib-item ${isDone ? 'practised' : ''}" onclick="selectAlgo('${id}')">
+                    <div><strong>${a.n}</strong> <small>${a.g}</small></div>
+                    <div class="tick-box" onclick="togglePractised('${id}', event)">${isDone ? '✓' : ''}</div>
+                </div>`;
+            });
         }
+
+        if (filter === 'ALL' || filter === 'OLL') {
+            html += '<div class="lib-divider">OLL Cases</div>';
+            [...new Set(ollSet)].forEach(name => {
+                const id = 'OLL ' + name;
+                const isDone = practised.includes(id);
+                html += `<div class="lib-item ${isDone ? 'practised' : ''}" onclick="selectAlgo('${id}')">
+                    <div><strong>${name}</strong></div>
+                    <div class="tick-box" onclick="togglePractised('${id}', event)">${isDone ? '✓' : ''}</div>
+                </div>`;
+            });
+        }
+        list.innerHTML = html;
     }
 
-    function adjustBPM(amount) {
-        bpm = Math.max(10, Math.min(500, bpm + amount));
-        updateDisplays();
-    }
-
-    function updateDisplays() {
-        document.getElementById('bpmDisplay').textContent = bpm;
-        document.getElementById('tpsDisplay').textContent = (bpm / 60).toFixed(2) + " TPS";
-    }
-
-    function scheduleNote(beat, bar, time) {
-        const osc = audioCtx.createOscillator();
-        const env = audioCtx.createGain();
-        osc.frequency.value = (beat === 0) ? 1100 : 700;
-        env.gain.setValueAtTime(0.15, time);
-        env.gain.exponentialRampToValueAtTime(0.01, time + 0.1);
-        osc.connect(env); env.connect(audioCtx.destination);
-        osc.start(time); osc.stop(time + 0.1);
-        
-        const delay = Math.max(0, (time - audioCtx.currentTime) * 1000);
-        setTimeout(() => {
-            document.body.classList.remove('flash-go', 'flash-listen');
-            document.body.classList.add(bar === 0 ? 'flash-listen' : 'flash-go');
-            const pill = document.getElementById('statusPill');
-            pill.style.display = 'inline-block';
-            pill.textContent = bar === 0 ? 'LISTEN' : 'GO!';
-            pill.style.backgroundColor = bar === 0 ? 'var(--accent-listen)' : 'var(--accent-go)';
-        }, delay);
+    function scheduleNote(beat, time) {
+        if (audioCtx) {
+            const osc = audioCtx.createOscillator();
+            const env = audioCtx.createGain();
+            osc.frequency.value = (beat === 0) ? 1000 : 600;
+            env.gain.setValueAtTime(0.1, time);
+            env.gain.exponentialRampToValueAtTime(0.001, time + 0.1);
+            osc.connect(env); env.connect(audioCtx.destination);
+            osc.start(time); osc.stop(time + 0.1);
+        }
+        if (visualFlash) {
+            const delay = Math.max(0, (time - audioCtx.currentTime) * 1000);
+            setTimeout(() => {
+                const flashClass = (beat === 0) ? 'flash-strong' : 'flash-weak';
+                document.body.classList.add(flashClass);
+                setTimeout(() => document.body.classList.remove(flashClass), 100);
+            }, delay);
+        }
     }
 
     function scheduler() {
         while (nextNoteTime < audioCtx.currentTime + 0.1) {
-            scheduleNote(currentBeat, currentBar, nextNoteTime);
+            scheduleNote(currentBeat, nextNoteTime);
             nextNoteTime += (60.0 / bpm);
             currentBeat = (currentBeat + 1) % 4;
-            if (currentBeat === 0) currentBar = (currentBar === 0) ? 1 : 0;
+            // Ramp Logic: Every 4 beats, increment BPM
+            if (currentBeat === 0 && rampActive) {
+                adjustBPM(1);
+            }
         }
         timerID = setTimeout(scheduler, 25.0);
     }
 
     document.getElementById('startBtn').addEventListener('click', async () => {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        if (audioCtx.state === 'suspended') await audioCtx.resume();
         if (isPlaying) {
-            clearTimeout(timerID);
-            isPlaying = false;
+            clearTimeout(timerID); isPlaying = false;
             document.getElementById('startBtn').textContent = "START";
             document.getElementById('startBtn').classList.remove('btn-stop');
-            document.getElementById('statusPill').style.display = 'none';
         } else {
-            if (audioCtx.state === 'suspended') await audioCtx.resume();
             nextNoteTime = audioCtx.currentTime + 0.05;
-            currentBeat = 0; currentBar = 0;
-            scheduler();
-            isPlaying = true;
+            currentBeat = 0; scheduler(); isPlaying = true;
             document.getElementById('startBtn').textContent = "STOP";
             document.getElementById('startBtn').classList.add('btn-stop');
         }
     });
 
-    document.getElementById('tapBtn').addEventListener('click', (e) => {
-        e.preventDefault();
-        const now = performance.now();
-        tapTimes.push(now);
-        if (tapTimes.length > 4) tapTimes.shift();
-        if (tapTimes.length > 1) {
-            const avg = (tapTimes[tapTimes.length-1] - tapTimes[0]) / (tapTimes.length - 1);
-            bpm = Math.round(60000 / avg);
-            updateDisplays();
-        }
-    });
-
-    function saveMilestone() {
-        sessionSaves++;
-        document.getElementById('sessionCount').textContent = `Session: ${sessionSaves} saved`;
-        const btn = document.querySelector('.sec-btn:last-child');
-        const originalText = btn.textContent;
-        btn.textContent = "SAVED! ✓";
-        setTimeout(() => btn.textContent = originalText, 1000);
+    function adjustBPM(val) {
+        bpm = Math.max(10, Math.min(500, bpm + val));
+        document.getElementById('bpmDisplay').textContent = bpm;
+        document.getElementById('tpsDisplay').textContent = (bpm / 60).toFixed(2) + " TPS";
     }
 
-    window.addEventListener('keydown', (e) => { 
-        if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') { 
-            e.preventDefault(); 
-            document.getElementById('startBtn').click(); 
-        } 
-    });
+    function toggleLibrary() {
+        const lib = document.getElementById('libraryOverlay');
+        lib.style.display = lib.style.display === 'flex' ? 'none' : 'flex';
+        if (lib.style.display === 'flex') renderLibrary();
+    }
 
-    updateDisplays();
+    function toggleFlash() {
+        visualFlash = !visualFlash;
+        const btn = document.getElementById('flashToggle');
+        btn.classList.toggle('active-toggle', visualFlash);
+    }
+
+    function toggleRamp() {
+        rampActive = !rampActive;
+        const btn = document.getElementById('rampToggle');
+        btn.classList.toggle('active-toggle', rampActive);
+    }
+
+    updateTally();
 </script>
-
 </body>
 </html>
