@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>CubeBeat Pro</title>
+    
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="icon" type="image/png" href="icon.png">
+    
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     
@@ -36,47 +40,51 @@
 
         .container { width: 90%; max-width: 450px; text-align: center; }
 
-        /* Display Area */
-        .bpm-display { font-size: 6rem; font-weight: 900; margin: 0; color: white; line-height: 1; }
-        .tps-sub { font-size: 1.2rem; color: #888; margin-bottom: 15px; }
-        .active-algo-name { font-weight: bold; color: var(--accent-listen); margin-bottom: 20px; font-size: 1.2rem; }
+        .bpm-display { font-size: 7rem; font-weight: 900; margin: 0; color: white; line-height: 1; }
+        .tps-sub { font-size: 1.4rem; color: #888; margin-bottom: 20px; }
+        .active-algo-name { font-weight: bold; color: var(--accent-listen); margin-bottom: 25px; font-size: 1.3rem; min-height: 1.4em; }
 
-        /* Controls */
-        .bpm-stepper { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; margin-bottom: 15px; }
-        .step-btn, .tap-btn { background: #2a2a2a; border: 1px solid #444; color: white; padding: 15px 5px; border-radius: 12px; font-weight: bold; }
-        .tap-btn { grid-column: span 4; color: var(--accent-listen); margin-top: 5px; }
+        .bpm-stepper { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 20px; }
+        .step-btn, .tap-btn { background: #2a2a2a; border: 1px solid #444; color: white; padding: 18px 5px; border-radius: 12px; font-weight: bold; font-size: 1.1rem; }
+        .tap-btn { grid-column: span 4; color: var(--accent-listen); margin-top: 5px; padding: 22px; text-transform: uppercase; letter-spacing: 1px; }
 
-        .btn-main { width: 100%; background-color: var(--accent-go); color: black; font-size: 1.5rem; border: none; padding: 20px; border-radius: 15px; font-weight: 900; }
+        .btn-main { width: 100%; background-color: var(--accent-go); color: black; font-size: 1.8rem; border: none; padding: 22px; border-radius: 18px; font-weight: 900; }
         .btn-stop { background-color: var(--danger); color: white; }
 
-        .secondary-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .sec-btn { background: #2a2a2a; border: 1px solid #444; color: white; padding: 12px; border-radius: 10px; font-size: 0.9rem; }
+        .secondary-btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 20px; }
+        .sec-btn { background: #2a2a2a; border: 1px solid #444; color: white; padding: 15px; border-radius: 12px; font-size: 0.95rem; font-weight: 600; }
 
-        /* Library Overlay */
         #libraryOverlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg); z-index: 100; display: none;
             flex-direction: column; padding: 20px; box-sizing: border-box;
         }
-        .lib-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .search-box { width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid #444; border-radius: 8px; color: white; margin-bottom: 15px; }
-        .lib-list { flex-grow: 1; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
-        .lib-item { background: #2a2a2a; padding: 15px 5px; border-radius: 8px; text-align: center; font-size: 0.9rem; border: 1px solid #333; }
+        .lib-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; }
+        
+        .filter-row { display: flex; gap: 12px; margin-bottom: 20px; }
+        select { 
+            flex: 1; padding: 15px; background: #2a2a2a; border: 1px solid #444; 
+            border-radius: 10px; color: white; font-size: 1.1rem; appearance: none;
+        }
 
-        /* Overview Section */
-        .stats-bar { display: flex; justify-content: space-around; background: #1a1a1a; padding: 10px; border-radius: 10px; margin-top: 20px; font-size: 0.8rem; color: #aaa; }
+        .lib-list { flex-grow: 1; overflow-y: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-bottom: 30px;}
+        .lib-item { background: #2a2a2a; padding: 20px 12px; border-radius: 12px; text-align: left; border: 1px solid #333; }
+        .lib-item strong { display: block; font-size: 1rem; color: white; }
+        .lib-item small { display: block; color: #777; margin-top: 6px; font-size: 0.75rem; text-transform: uppercase; }
+
+        .stats-bar { display: flex; justify-content: space-around; background: #1a1a1a; padding: 12px; border-radius: 12px; margin-top: 25px; font-size: 0.85rem; color: #888; }
 
         button { cursor: pointer; -webkit-tap-highlight-color: transparent; }
-        button:active { transform: scale(0.95); }
+        button:active { transform: scale(0.96); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <div id="statusPill" style="display:none; padding: 5px 15px; border-radius: 20px; font-size: 0.8rem; font-weight: bold; margin-bottom: 10px;">LISTEN</div>
+    <div id="statusPill" style="display:none; padding: 6px 18px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; margin-bottom: 12px;">LISTEN</div>
     <div class="active-algo-name" id="currentAlgoDisplay">Select Algorithm</div>
-    <div class="bpm-display" id="bpmDisplay">120</div>
-    <div class="tps-sub" id="tpsDisplay">2.00 TPS</div>
+    <div class="bpm-display" id="bpmDisplay">30</div>
+    <div class="tps-sub" id="tpsDisplay">0.50 TPS</div>
 
     <div class="bpm-stepper">
         <button class="step-btn" onclick="adjustBPM(-5)">-5</button>
@@ -101,34 +109,94 @@
 
 <div id="libraryOverlay">
     <div class="lib-header">
-        <h2>Algorithms</h2>
-        <button onclick="toggleLibrary()" style="background:none; border:none; color:var(--danger); font-size:1.5rem;">✕</button>
+        <h2 style="margin:0">Algorithms</h2>
+        <button onclick="toggleLibrary()" style="background:none; border:none; color:var(--danger); font-size:2rem; padding:10px;">✕</button>
     </div>
-    <input type="text" class="search-box" id="libSearch" placeholder="Search PLL or OLL..." oninput="filterLibrary()">
+    
+    <div class="filter-row">
+        <select id="typeSelect" onchange="updateGroupOptions()">
+            <option value="OLL">OLL</option>
+            <option value="PLL">PLL</option>
+        </select>
+        <select id="groupSelect" onchange="renderLibrary()">
+        </select>
+    </div>
+    
     <div class="lib-list" id="libList"></div>
 </div>
 
 <script>
     let audioCtx = null, nextNoteTime = 0.0, timerID = null, isPlaying = false;
-    let currentBeat = 0, currentBar = 0, bpm = 120, currentAlgo = "None";
+    let currentBeat = 0, currentBar = 0, bpm = 30, currentAlgo = "None";
     let tapTimes = [], sessionSaves = 0;
 
-    const algos = [
-        ...['Aa', 'Ab', 'E', 'F', 'Ga', 'Gb', 'Gc', 'Gd', 'H', 'Ja', 'Jb', 'Na', 'Nb', 'Ra', 'Rb', 'T', 'Ua', 'Ub', 'V', 'Y', 'Z'].map(n => 'PLL ' + n),
-        ...Array.from({length: 57}, (_, i) => 'OLL ' + (i + 1))
+    const pllAlgos = [
+        { name: 'Aa', group: 'Adjacent' }, { name: 'Ab', group: 'Adjacent' }, 
+        { name: 'E', group: 'Corners Only' }, { name: 'F', group: 'Adjacent' },
+        { name: 'Ga', group: 'G-Perms' }, { name: 'Gb', group: 'G-Perms' }, 
+        { name: 'Gc', group: 'G-Perms' }, { name: 'Gd', group: 'G-Perms' },
+        { name: 'H', group: 'Edges Only' }, { name: 'Ja', group: 'Adjacent' }, 
+        { name: 'Jb', group: 'Adjacent' }, { name: 'Na', group: 'Adjacent' }, 
+        { name: 'Nb', group: 'Adjacent' }, { name: 'Ra', group: 'Adjacent' }, 
+        { name: 'Rb', group: 'Adjacent' }, { name: 'T', group: 'Adjacent' },
+        { name: 'Ua', group: 'Edges Only' }, { name: 'Ub', group: 'Edges Only' }, 
+        { name: 'V', group: 'Adjacent' }, { name: 'Y', group: 'Adjacent' }, 
+        { name: 'Z', group: 'Edges Only' }
     ];
 
-    function toggleLibrary() {
-        const lib = document.getElementById('libraryOverlay');
-        lib.style.display = lib.style.display === 'flex' ? 'none' : 'flex';
-        if (lib.style.display === 'flex') renderLibrary();
+    const ollGroups = {
+        "Easy Algs": ["T", "P", "Breakneck", "Seein' Headlights", "Key", "Ant", "Mounted Fish", "Big Lightning"],
+        "Oriented-Edges": ["Sune", "Anti-Sune", "Cross", "Chameleon", "Bowtie", "Bruno", "Headlights"],
+        "T-shapes & Squares": ["T", "Righty-Square", "Lefty-Square"],
+        "Solved Corners": ["Arrow", "H", "Lightning", "Downstairs", "Big Lightning", "Reverse Lightning", "Upstairs", "Lefty Big Lightning"],
+        "P-shapes": ["P", "Couch", "Inverse P", "Anti-Couch"],
+        "C, Fish & L-shapes": ["Seein' Headlights", "City", "Mounted Fish", "Fish Salad", "Breakneck", "Frying Pan", "Front Squeezy", "Kite", "Anti-Kite", "Anti-Breakneck", "Anti-Frying Pan", "Back Squeezy"],
+        "W, Lines & Knights": ["Mario", "Wario", "Ant", "Rice Cooker", "Streetlights", "Squeegee", "Gun", "Highway", "Anti-Squeegee", "Anti-Gun"],
+        "Awkward & Dots": ["Poodle", "Anti-Poodle", "WTF", "Anti-WTF", "Blank", "Slash", "Bunny", "Nazi", "Anti-Nazi", "Zamboni", "Crown", "X"]
+    };
+
+    function updateGroupOptions() {
+        const type = document.getElementById('typeSelect').value;
+        const groupSelect = document.getElementById('groupSelect');
+        groupSelect.innerHTML = '<option value="All">All Groups</option>';
+        
+        if (type === 'OLL') {
+            Object.keys(ollGroups).forEach(group => {
+                groupSelect.innerHTML += `<option value="${group}">${group}</option>`;
+            });
+        } else {
+            const pllGroups = [...new Set(pllAlgos.map(a => a.group))];
+            pllGroups.forEach(group => {
+                groupSelect.innerHTML += `<option value="${group}">${group}</option>`;
+            });
+        }
+        renderLibrary();
     }
 
     function renderLibrary() {
         const list = document.getElementById('libList');
-        const filter = document.getElementById('libSearch').value.toLowerCase();
-        list.innerHTML = algos.filter(a => a.toLowerCase().includes(filter)).map(a => 
-            `<div class="lib-item" onclick="selectAlgo('${a}')">${a}</div>`
+        const type = document.getElementById('typeSelect').value;
+        const groupFilter = document.getElementById('groupSelect').value;
+        
+        let items = [];
+        if (type === 'PLL') {
+            items = pllAlgos.filter(a => (groupFilter === 'All' || a.group === groupFilter))
+                            .map(a => ({ name: 'PLL ' + a.name, category: a.group }));
+        } else {
+            if (groupFilter === 'All') {
+                Object.keys(ollGroups).forEach(group => {
+                    ollGroups[group].forEach(name => items.push({ name: 'OLL ' + name, category: group }));
+                });
+            } else {
+                ollGroups[groupFilter].forEach(name => items.push({ name: 'OLL ' + name, category: groupFilter }));
+            }
+        }
+
+        list.innerHTML = items.map(a => 
+            `<div class="lib-item" onclick="selectAlgo('${a.name}')">
+                <strong>${a.name}</strong>
+                <small>${a.category}</small>
+            </div>`
         ).join('');
     }
 
@@ -138,10 +206,15 @@
         toggleLibrary();
     }
 
-    function filterLibrary() { renderLibrary(); }
+    function toggleLibrary() {
+        const lib = document.getElementById('libraryOverlay');
+        const isOpening = lib.style.display !== 'flex';
+        lib.style.display = isOpening ? 'flex' : 'none';
+        if (isOpening) updateGroupOptions();
+    }
 
     function adjustBPM(amount) {
-        bpm = Math.max(30, Math.min(500, bpm + amount));
+        bpm = Math.max(10, Math.min(500, bpm + amount));
         updateDisplays();
     }
 
@@ -150,7 +223,6 @@
         document.getElementById('tpsDisplay').textContent = (bpm / 60).toFixed(2) + " TPS";
     }
 
-    // Audio & Metronome Logic (Same robust logic as before)
     function scheduleNote(beat, bar, time) {
         const osc = audioCtx.createOscillator();
         const env = audioCtx.createGain();
@@ -182,12 +254,13 @@
     }
 
     document.getElementById('startBtn').addEventListener('click', async () => {
-        if (!audioCtx) audioCtx = new AudioContext();
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
         if (isPlaying) {
             clearTimeout(timerID);
             isPlaying = false;
             document.getElementById('startBtn').textContent = "START";
             document.getElementById('startBtn').classList.remove('btn-stop');
+            document.getElementById('statusPill').style.display = 'none';
         } else {
             if (audioCtx.state === 'suspended') await audioCtx.resume();
             nextNoteTime = audioCtx.currentTime + 0.05;
@@ -199,16 +272,8 @@
         }
     });
 
-    function saveMilestone() {
-        sessionSaves++;
-        document.getElementById('sessionCount').textContent = `Session: ${sessionSaves} saved`;
-        // Alert feedback
-        const btn = document.querySelector('.sec-btn:last-child');
-        btn.textContent = "SAVED! ✓";
-        setTimeout(() => btn.textContent = "⭐ SAVE PB", 1000);
-    }
-
-    document.getElementById('tapBtn').addEventListener('click', () => {
+    document.getElementById('tapBtn').addEventListener('click', (e) => {
+        e.preventDefault();
         const now = performance.now();
         tapTimes.push(now);
         if (tapTimes.length > 4) tapTimes.shift();
@@ -217,6 +282,22 @@
             bpm = Math.round(60000 / avg);
             updateDisplays();
         }
+    });
+
+    function saveMilestone() {
+        sessionSaves++;
+        document.getElementById('sessionCount').textContent = `Session: ${sessionSaves} saved`;
+        const btn = document.querySelector('.sec-btn:last-child');
+        const originalText = btn.textContent;
+        btn.textContent = "SAVED! ✓";
+        setTimeout(() => btn.textContent = originalText, 1000);
+    }
+
+    window.addEventListener('keydown', (e) => { 
+        if (e.code === 'Space' && e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') { 
+            e.preventDefault(); 
+            document.getElementById('startBtn').click(); 
+        } 
     });
 
     updateDisplays();
