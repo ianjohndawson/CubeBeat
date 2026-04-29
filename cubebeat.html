@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="CubeBeat" />
+<meta name="theme-color" content="#0a0a0a" />
+<title>CubeBeat</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet" />
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+
+  :root {
+    --bg: #0a0a0a;
+    --bg-deep: #060606;
+    --bg-elevated: #161616;
+    --border: #242424;
+    --border-strong: #353535;
+    --text: #f0ede5;
+    --text-dim: #807870;
+    --text-faint: #4a4642;
+    --accent: #f5b942;
+    --accent-glow: rgba(245, 185, 66, 0.4);
+    --accent-dim: #5a4520;
+
+    --st-white:  #f4f4f1;
+    --st-yellow: #ffd000;
+    --st-red:    #c8102e;
+    --st-orange: #ff5800;
+    --st-blue:   #0046ad;
+    --st-green:  #009b48;
+
+    --safe-top: env(safe-area-inset-top, 0);
+    --safe-bottom: env(safe-area-inset-bottom, 0);
+  }
+
+  html, body {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    -webkit-font-smoothing: antialiased;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none;
+    user-select: none;
+    overscroll-behavior: none;
+    touch-action: manipulation;
+  }
+
+  body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100dvh;
+    padding-top: var(--safe-top);
+    padding-bottom: var(--safe-bottom);
+    background:
+      radial-gradient(ellipse at 50% -10%, rgba(245, 185, 66, 0.04) 0%, transparent 55%),
+      radial-gradient(ellipse at 50% 110%, rgba(0, 70, 173, 0.05) 0%, transparent 55%),
+      var(--bg);
+    position: relative;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' seed='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.6 0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");
+    opacity: 0.05;
+    z-index: 1;
+    mix-blend-mode: overlay;
+  }
+
+  .app {
+    flex: 1;
+    max-width: 580px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 20px 22px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 22px;
+    position: relative;
+    z-index: 2;
+    animation: appIn 0.6s ease-out both;
+  }
+  @keyframes appIn {
+    from { opacity: 0; transform: translateY(6px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ---------- HEADER ---------- */
+  header {
+    position: relative;
+    padding-bottom: 18px;
+  }
+  header::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 3px;
+    background: linear-gradient(to right,
+      var(--st-white)  0%   16.66%,
+      var(--st-yellow) 16.66% 33.33%,
+      var(--st-red)    33.33% 50%,
+      var(--st-orange) 50%   66.66%,
+      var(--st-blue)   66.66% 83.33%,
+      var(--st-green)  83.33% 100%
+    );
+    border-radius: 1px;
+    opacity: 0.85;
+  }
+  .header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+  }
+  .brand {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .brand-mark {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.5));
+  }
+  .title {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-size: 30px;
+    letter-spacing: -0.02em;
+    margin: 0;
+    line-height: 1;
+    font-variation-settings: 'opsz' 144, 'SOFT' 50;
+  }
+  .title .light  { font-weight: 300; color: var(--text); }
+  .title .heavy  { font-weight: 700; color: var(--text); }
+  .subtitle {
+    font-size: 10px;
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    text-align: right;
+    line-height: 1.4;
+  }
+  .subtitle strong {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  /* ---------- BPM DISPLAY ---------- */
+  .display {
+    text-align: center;
+    padding: 8px 0 4px;
+  }
+  .display-label {
+    font-size: 10px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-bottom: 8px;
+  }
+  .bpm-frame {
+    position: relative;
+    display: inline-block;
+    padding: 14px 36px 10px;
+  }
+  .corner {
+    position: absolute;
+    width: 18px;
+    height: 18px;
+    border: 0 solid var(--text-faint);
+    transition: border-color 0.4s ease;
+  }
+  .corner.tl { top: 0; left: 0;     border-top-width: 1.5px; border-left-width: 1.5px; }
+  .corner.tr { top: 0; right: 0;    border-top-width: 1.5px; border-right-width: 1.5px; }
+  .corner.bl { bottom: 0; left: 0;  border-bottom-width: 1.5px; border-left-width: 1.5px; }
+  .corner.br { bottom: 0; right: 0; border-bottom-width: 1.5px; border-right-width: 1.5px; }
+  .bpm-frame.tempo-changed .corner { border-color: var(--accent); }
+
+  .bpm-number {
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-style: italic;
+    font-size: clamp(110px, 30vw, 170px);
+    line-height: 0.9;
+    letter-spacing: -0.05em;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+    transition: color 0.5s ease;
+    font-variation-settings: 'opsz' 144, 'SOFT' 30;
+  }
+  .bpm-number.tempo-changed {
+    color: var(--accent);
+    animation: tempoBump 0.55s ease-out;
+  }
+  @keyframes tempoBump {
+    0%   { transform: scale(0.96); }
+    55%  { transform: scale(1.025); }
+    100% { transform: scale(1); }
+  }
+  .bpm-unit {
+    font-size: 11px;
+    letter-spacing: 0.32em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    margin-top: 6px;
+  }
+
+  /* ---------- BEAT INDICATOR ---------- */
+  .beats {
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    padding: 4px 0;
+  }
+  .beat {
+    width: 22px;
+    height: 22px;
+    border-radius: 5px;
+    border: 1.5px solid var(--border-strong);
+    transition: all 0.06s ease-out;
+  }
+  .beat.downbeat { border-color: var(--text-dim); }
+  .beat.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    transform: scale(1.18);
+    box-shadow: 0 0 28px var(--accent-glow), inset 0 0 0 1.5px rgba(0,0,0,0.15);
+  }
+  .beat.active.downbeat {
+    background: var(--text);
+    border-color: var(--text);
+    box-shadow: 0 0 28px rgba(240, 237, 229, 0.4), inset 0 0 0 1.5px rgba(0,0,0,0.15);
+  }
+
+  /* ---------- STATUS ---------- */
+  .ramp-status {
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+    min-height: 14px;
+  }
+  .ramp-status .arrow { color: var(--accent); margin: 0 4px; }
+
+  /* ---------- TRANSPORT ---------- */
+  .play-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 15px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    background: var(--text);
+    color: var(--bg);
+    border: 1px solid var(--text);
+    border-radius: 4px;
+    padding: 24px;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    -webkit-appearance: none;
+    width: 100%;
+  }
+  .play-btn:active { transform: scale(0.99); }
+  .play-btn.playing {
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 32px var(--accent-glow);
+  }
+
+  /* ---------- FIELDS ---------- */
+  .fields {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    border-top: 1px solid var(--border);
+    padding-top: 22px;
+  }
+  .field { display: flex; flex-direction: column; gap: 8px; }
+  .field-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .field-label {
+    font-size: 10px;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  .field-unit {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* ---------- SEGMENTED ---------- */
+  .segmented {
+    display: flex;
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    overflow: hidden;
+    background: var(--bg-deep);
+  }
+  .segmented button {
+    flex: 1;
+    padding: 18px 12px;
+    background: transparent;
+    border: none;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: all 0.15s ease;
+    -webkit-appearance: none;
+    border-right: 1px solid var(--border-strong);
+  }
+  .segmented button:last-child { border-right: none; }
+  .segmented button.active {
+    background: var(--text);
+    color: var(--bg);
+  }
+
+  /* ---------- STEPPERS ---------- */
+  .stepper {
+    display: grid;
+    grid-template-columns: 72px 1fr 72px;
+    gap: 10px;
+  }
+  /* 5-button variant for tempo */
+  .stepper-wide {
+    grid-template-columns: 1fr 1fr 1.6fr 1fr 1fr;
+    gap: 6px;
+  }
+  .step-btn {
+    height: 64px;
+    background: var(--bg-deep);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'Fraunces', serif;
+    font-weight: 300;
+    font-size: 32px;
+    line-height: 1;
+    cursor: pointer;
+    -webkit-appearance: none;
+    transition: all 0.1s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* In the wide stepper, ±5 / ±1 use mono for a control-panel feel */
+  .stepper-wide .step-btn {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 16px;
+    letter-spacing: 0.04em;
+  }
+  .step-btn:active {
+    background: var(--bg-elevated);
+    border-color: var(--text-dim);
+    color: var(--accent);
+  }
+  .step-btn:disabled {
+    color: var(--text-faint);
+    cursor: default;
+    border-color: var(--border);
+    background: transparent;
+  }
+  .step-value {
+    height: 64px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 500;
+    font-size: 26px;
+    font-variant-numeric: tabular-nums;
+    color: var(--text);
+  }
+  /* Live-edit affordance: show stepper value glows when playing (it's controlling live tempo) */
+  body.is-playing .stepper-wide .step-value {
+    color: var(--accent);
+    border-color: rgba(245, 185, 66, 0.35);
+  }
+
+  /* ---------- VOLUME SLIDER ---------- */
+  .slider-wrap {
+    height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 0 4px;
+  }
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    outline: none;
+    background-image: linear-gradient(to right, var(--accent) 0%, var(--accent) var(--vol, 60%), var(--border) var(--vol, 60%), var(--border) 100%);
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 32px;
+    height: 32px;
+    background: var(--text);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 32px;
+    height: 32px;
+    background: var(--text);
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  /* ---------- RAMP-ONLY VISIBILITY ---------- */
+  .ramp-only { display: flex; flex-direction: column; gap: 18px; }
+  .mode-steady .ramp-only { display: none; }
+  .mode-steady .ramp-status { visibility: hidden; }
+
+  /* ---------- FLASH OVERLAY ---------- */
+  .flash-overlay {
+    position: fixed;
+    inset: 0;
+    background: #ffffff;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 9999;
+  }
+
+  /* ---------- FOOTER ---------- */
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding-top: 8px;
+  }
+  .footer-stripe {
+    display: flex;
+    gap: 3px;
+  }
+  .footer-stripe span {
+    width: 8px;
+    height: 8px;
+    border-radius: 1.5px;
+    opacity: 0.85;
+  }
+  .footer-text {
+    font-size: 10px;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--text-faint);
+  }
+  .footer-text em {
+    font-family: 'Fraunces', serif;
+    font-style: italic;
+    font-weight: 500;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 12px;
+    color: var(--text-dim);
+  }
+
+  @media (max-height: 720px) {
+    .bpm-number { font-size: clamp(80px, 22vw, 130px); }
+    .app { gap: 16px; padding: 14px 20px; }
+    .step-btn, .step-value { height: 56px; }
+    .play-btn { padding: 20px; }
+    .title { font-size: 26px; }
+  }
+</style>
+</head>
+<body class="mode-steady">
+  <div class="flash-overlay" id="flashOverlay"></div>
+
+  <div class="app">
+    <header>
+      <div class="header-row">
+        <div class="brand">
+          <svg class="brand-mark" viewBox="0 0 30 30" aria-hidden="true">
+            <rect x="0"  y="0"  width="8" height="8" rx="1.5" fill="#f4f4f1"/>
+            <rect x="11" y="0"  width="8" height="8" rx="1.5" fill="#ffd000"/>
+            <rect x="22" y="0"  width="8" height="8" rx="1.5" fill="#0046ad"/>
+            <rect x="0"  y="11" width="8" height="8" rx="1.5" fill="#c8102e"/>
+            <rect x="11" y="11" width="8" height="8" rx="1.5" fill="#009b48"/>
+            <rect x="22" y="11" width="8" height="8" rx="1.5" fill="#ff5800"/>
+            <rect x="0"  y="22" width="8" height="8" rx="1.5" fill="#ffd000"/>
+            <rect x="11" y="22" width="8" height="8" rx="1.5" fill="#f4f4f1"/>
+            <rect x="22" y="22" width="8" height="8" rx="1.5" fill="#c8102e"/>
+          </svg>
+          <h1 class="title"><span class="light">Cube</span><span class="heavy">Beat</span></h1>
+        </div>
+        <div class="subtitle">Algorithm<br/><strong>Drill Trainer</strong></div>
+      </div>
+    </header>
+
+    <div class="display">
+      <div class="display-label">Tempo</div>
+      <div class="bpm-frame" id="bpmFrame">
+        <span class="corner tl"></span>
+        <span class="corner tr"></span>
+        <span class="corner bl"></span>
+        <span class="corner br"></span>
+        <div class="bpm-number" id="bpmNumber">60</div>
+      </div>
+      <div class="bpm-unit">Beats Per Minute</div>
+    </div>
+
+    <div class="beats" id="beats"></div>
+
+    <div class="ramp-status" id="rampStatus"></div>
+
+    <button class="play-btn" id="playBtn">Start</button>
+
+    <div class="fields">
+      <!-- MODE -->
+      <div class="field">
+        <div class="field-header"><span class="field-label">Mode</span></div>
+        <div class="segmented" id="modeSeg">
+          <button data-value="steady" class="active">Steady</button>
+          <button data-value="ramp">Ramp</button>
+        </div>
+      </div>
+
+      <!-- TEMPO (5-button stepper, also live-editable during play) -->
+      <div class="field">
+        <div class="field-header">
+          <span class="field-label" id="tempoLabel">Tempo</span>
+          <span class="field-unit">BPM</span>
+        </div>
+        <div class="stepper stepper-wide" data-key="tempo" data-min="20" data-max="400">
+          <button class="step-btn" data-dir="-1" data-amount="5">−5</button>
+          <button class="step-btn" data-dir="-1" data-amount="1">−1</button>
+          <span class="step-value">60</span>
+          <button class="step-btn" data-dir="1" data-amount="1">+1</button>
+          <button class="step-btn" data-dir="1" data-amount="5">+5</button>
+        </div>
+      </div>
+
+      <!-- TIME -->
+      <div class="field">
+        <div class="field-header"><span class="field-label">Time</span></div>
+        <div class="segmented" id="timeSeg">
+          <button data-value="3">3 / 4</button>
+          <button data-value="4" class="active">4 / 4</button>
+        </div>
+      </div>
+
+      <!-- RAMP-ONLY -->
+      <div class="ramp-only">
+        <div class="field">
+          <div class="field-header">
+            <span class="field-label">Increase by</span>
+            <span class="field-unit">BPM</span>
+          </div>
+          <div class="stepper" data-key="step" data-min="1" data-max="50">
+            <button class="step-btn" data-dir="-1" data-amount="1">−</button>
+            <span class="step-value">5</span>
+            <button class="step-btn" data-dir="1" data-amount="1">+</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-header">
+            <span class="field-label">Every</span>
+            <span class="field-unit">Bars</span>
+          </div>
+          <div class="stepper" data-key="every" data-min="1" data-max="32">
+            <button class="step-btn" data-dir="-1" data-amount="1">−</button>
+            <span class="step-value">2</span>
+            <button class="step-btn" data-dir="1" data-amount="1">+</button>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-header">
+            <span class="field-label">Up to</span>
+            <span class="field-unit">BPM</span>
+          </div>
+          <div class="stepper" data-key="target" data-min="20" data-max="400">
+            <button class="step-btn" data-dir="-1" data-amount="5">−</button>
+            <span class="step-value">240</span>
+            <button class="step-btn" data-dir="1" data-amount="5">+</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- FLASH -->
+      <div class="field">
+        <div class="field-header"><span class="field-label">Screen Flash</span></div>
+        <div class="segmented" id="flashSeg">
+          <button data-value="off" class="active">Off</button>
+          <button data-value="on">On</button>
+        </div>
+      </div>
+
+      <!-- VOLUME -->
+      <div class="field">
+        <div class="field-header">
+          <span class="field-label">Volume</span>
+          <span class="field-unit" id="volumeReadout">60%</span>
+        </div>
+        <div class="slider-wrap">
+          <input type="range" id="volumeSlider" min="0" max="100" value="60" />
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <div class="footer-stripe">
+        <span style="background: var(--st-white)"></span>
+        <span style="background: var(--st-yellow)"></span>
+        <span style="background: var(--st-red)"></span>
+        <span style="background: var(--st-orange)"></span>
+        <span style="background: var(--st-blue)"></span>
+        <span style="background: var(--st-green)"></span>
+      </div>
+      <div class="footer-text"><em>CubeBeat</em> · Built for Speedcubers</div>
+    </div>
+  </div>
+
+<script>
+(function() {
+  'use strict';
+
+  // ============================================================
+  //  STATE
+  // ============================================================
+  const state = {
+    audioCtx: null,
+    isPlaying: false,
+    finalized: true,        // guard against double-finalisation
+    reachedTarget: false,   // set by ramp auto-stop; suppresses tempo save
+    currentBeat: 0,
+    currentBar: 0,
+    currentBPM: 60,
+    config: {
+      mode: 'steady',
+      timeSig: 4,
+      tempo: 60,            // default start tempo (was 120)
+      step: 5,
+      every: 2,
+      target: 240,
+      flash: false,
+      volume: 0.6,
+    },
+    nextNoteTime: 0,
+    timerID: null,
+    notesInQueue: [],
+    wakeLock: null,
+  };
+
+  const LOOKAHEAD_MS = 25;
+  const SCHEDULE_AHEAD_S = 0.1;
+  const STORAGE_KEY = 'cubebeat.v4';
+
+  function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
+
+  // ============================================================
+  //  DOM
+  // ============================================================
+  const el = {
+    body: document.body,
+    flashOverlay: document.getElementById('flashOverlay'),
+    bpmNumber: document.getElementById('bpmNumber'),
+    bpmFrame: document.getElementById('bpmFrame'),
+    beats: document.getElementById('beats'),
+    rampStatus: document.getElementById('rampStatus'),
+    playBtn: document.getElementById('playBtn'),
+    modeSeg: document.getElementById('modeSeg'),
+    timeSeg: document.getElementById('timeSeg'),
+    flashSeg: document.getElementById('flashSeg'),
+    tempoLabel: document.getElementById('tempoLabel'),
+    volumeSlider: document.getElementById('volumeSlider'),
+    volumeReadout: document.getElementById('volumeReadout'),
+  };
+
+  // ============================================================
+  //  AUDIO
+  // ============================================================
+  function ensureAudioContext() {
+    if (!state.audioCtx) {
+      const Ctor = window.AudioContext || window.webkitAudioContext;
+      state.audioCtx = new Ctor();
+    }
+    if (state.audioCtx.state === 'suspended') state.audioCtx.resume();
+  }
+
+  function scheduleClick(time, isDownbeat) {
+    const ctx = state.audioCtx;
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(isDownbeat ? 1500 : 850, time);
+
+    const peak = state.config.volume * (isDownbeat ? 0.6 : 0.4);
+    gain.gain.setValueAtTime(0, time);
+    gain.gain.linearRampToValueAtTime(peak, time + 0.001);
+    gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+    osc.start(time);
+    osc.stop(time + 0.06);
+  }
+
+  // ============================================================
+  //  SCHEDULER
+  // ============================================================
+  function scheduler() {
+    while (state.isPlaying && state.nextNoteTime < state.audioCtx.currentTime + SCHEDULE_AHEAD_S) {
+      const isDownbeat = state.currentBeat === 0;
+      scheduleClick(state.nextNoteTime, isDownbeat);
+      state.notesInQueue.push({
+        time: state.nextNoteTime,
+        beat: state.currentBeat,
+        bar: state.currentBar,
+        bpm: state.currentBPM,
+        isDownbeat,
+      });
+      advanceNote();
+    }
+    if (state.isPlaying) {
+      state.timerID = setTimeout(scheduler, LOOKAHEAD_MS);
+    }
+  }
+
+  function advanceNote() {
+    const secondsPerBeat = 60.0 / state.currentBPM;
+    state.nextNoteTime += secondsPerBeat;
+    state.currentBeat++;
+
+    if (state.currentBeat >= state.config.timeSig) {
+      state.currentBeat = 0;
+      state.currentBar++;
+
+      if (state.config.mode === 'ramp' && state.currentBar >= state.config.every) {
+        state.currentBar = 0;
+        const next = state.currentBPM + state.config.step;
+        if (next > state.config.target) {
+          // Auto-stop: target reached. Stop scheduling new notes.
+          state.reachedTarget = true;
+          state.isPlaying = false;
+          return;
+        }
+        state.currentBPM = next;
+      }
+    }
+  }
+
+  // ============================================================
+  //  VISUAL DRAW LOOP
+  // ============================================================
+  function drawLoop() {
+    if (!state.audioCtx) {
+      requestAnimationFrame(drawLoop);
+      return;
+    }
+    const now = state.audioCtx.currentTime;
+    let last = null;
+    while (state.notesInQueue.length && state.notesInQueue[0].time <= now) {
+      last = state.notesInQueue.shift();
+    }
+
+    if (last) {
+      updateBeatLights(last.beat);
+      if (state.config.flash) flashScreen(last.isDownbeat);
+
+      const shown = parseInt(el.bpmNumber.textContent, 10);
+      if (last.bpm !== shown) {
+        el.bpmNumber.textContent = last.bpm;
+        flashTempoChange();
+        updateAllStepperDisplays();
+      }
+      updateRampStatus(last.bar, last.bpm);
+    }
+
+    if (state.isPlaying || state.notesInQueue.length) {
+      requestAnimationFrame(drawLoop);
+    } else if (!state.finalized) {
+      finalizeStop();
+    }
+  }
+
+  function updateBeatLights(beatIndex) {
+    const dots = el.beats.querySelectorAll('.beat');
+    dots.forEach((dot, i) => {
+      dot.classList.toggle('active', i === beatIndex);
+    });
+  }
+
+  function flashScreen(strong) {
+    el.flashOverlay.style.transition = 'none';
+    el.flashOverlay.style.opacity = strong ? '0.42' : '0.18';
+    void el.flashOverlay.offsetWidth;
+    el.flashOverlay.style.transition = 'opacity 130ms ease-out';
+    el.flashOverlay.style.opacity = '0';
+  }
+
+  function flashTempoChange() {
+    el.bpmNumber.classList.remove('tempo-changed');
+    el.bpmFrame.classList.remove('tempo-changed');
+    void el.bpmNumber.offsetWidth;
+    el.bpmNumber.classList.add('tempo-changed');
+    el.bpmFrame.classList.add('tempo-changed');
+    setTimeout(() => {
+      el.bpmNumber.classList.remove('tempo-changed');
+      el.bpmFrame.classList.remove('tempo-changed');
+    }, 700);
+  }
+
+  function updateRampStatus(barIndex, bpm) {
+    if (state.config.mode !== 'ramp') {
+      el.rampStatus.textContent = '';
+      return;
+    }
+    const next = bpm + state.config.step;
+    if (next > state.config.target) {
+      el.rampStatus.textContent = 'Final tempo';
+      return;
+    }
+    const barsLeft = state.config.every - barIndex;
+    el.rampStatus.innerHTML = `Next <span class="arrow">→</span> ${next} BPM in ${barsLeft} bar${barsLeft === 1 ? '' : 's'}`;
+  }
+
+  // ============================================================
+  //  TRANSPORT
+  // ============================================================
+  async function start() {
+    if (state.isPlaying) return;
+    ensureAudioContext();
+    if (state.audioCtx.state === 'suspended') await state.audioCtx.resume();
+
+    state.currentBeat = 0;
+    state.currentBar = 0;
+    state.currentBPM = state.config.tempo;
+    state.nextNoteTime = state.audioCtx.currentTime + 0.08;
+    state.notesInQueue = [];
+    state.reachedTarget = false;
+    state.finalized = false;
+    state.isPlaying = true;
+
+    el.body.classList.add('is-playing');
+    el.playBtn.textContent = 'Stop';
+    el.playBtn.classList.add('playing');
+    el.bpmNumber.textContent = state.currentBPM;
+    updateAllStepperDisplays();
+
+    requestWakeLock();
+    scheduler();
+    requestAnimationFrame(drawLoop);
+  }
+
+  function stop() {
+    // User-initiated stop. Just set the flag; drawLoop will finalise.
+    state.isPlaying = false;
+    if (state.timerID) { clearTimeout(state.timerID); state.timerID = null; }
+    state.notesInQueue = [];
+    // If no draw frame is pending, finalise directly
+    if (state.finalized) return;
+    // Trigger one more frame so it gets to the finalise branch
+    requestAnimationFrame(drawLoop);
+  }
+
+  function finalizeStop() {
+    if (state.finalized) return;
+    state.finalized = true;
+    state.isPlaying = false;
+
+    // Remember-where-stopped: save currentBPM as new start tempo,
+    // unless we auto-stopped at the target (start fresh next time).
+    if (!state.reachedTarget && state.currentBPM !== state.config.tempo) {
+      state.config.tempo = clamp(state.currentBPM, 20, 400);
+      saveConfig();
+    }
+    state.reachedTarget = false;
+
+    el.body.classList.remove('is-playing');
+    el.playBtn.textContent = 'Start';
+    el.playBtn.classList.remove('playing');
+    el.rampStatus.textContent = '';
+    updateBeatLights(-1);
+    el.bpmNumber.textContent = state.config.tempo;
+    updateAllStepperDisplays();
+    releaseWakeLock();
+  }
+
+  // ============================================================
+  //  WAKE LOCK
+  // ============================================================
+  async function requestWakeLock() {
+    if ('wakeLock' in navigator) {
+      try { state.wakeLock = await navigator.wakeLock.request('screen'); } catch (e) {}
+    }
+  }
+  async function releaseWakeLock() {
+    if (state.wakeLock) { try { await state.wakeLock.release(); } catch (e) {} state.wakeLock = null; }
+  }
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && state.isPlaying) requestWakeLock();
+  });
+
+  // ============================================================
+  //  RENDER / CONFIG
+  // ============================================================
+  function renderBeats() {
+    el.beats.innerHTML = '';
+    for (let i = 0; i < state.config.timeSig; i++) {
+      const dot = document.createElement('div');
+      dot.className = 'beat' + (i === 0 ? ' downbeat' : '');
+      el.beats.appendChild(dot);
+    }
+  }
+
+  function applyMode() {
+    el.body.classList.toggle('mode-steady', state.config.mode === 'steady');
+    el.body.classList.toggle('mode-ramp', state.config.mode === 'ramp');
+    el.tempoLabel.textContent = state.config.mode === 'ramp' ? 'Start Tempo' : 'Tempo';
+  }
+
+  function setSegmentedActive(container, value) {
+    container.querySelectorAll('button').forEach(b => {
+      b.classList.toggle('active', b.dataset.value === String(value));
+    });
+  }
+
+  function effectiveValue(key) {
+    // Tempo stepper controls live BPM during play; otherwise reads config.
+    if (key === 'tempo' && state.isPlaying) return state.currentBPM;
+    return state.config[key];
+  }
+
+  function updateAllStepperDisplays() {
+    document.querySelectorAll('.stepper').forEach(s => {
+      const key = s.dataset.key;
+      const val = effectiveValue(key);
+      s.querySelector('.step-value').textContent = val;
+      const min = parseInt(s.dataset.min, 10);
+      const max = parseInt(s.dataset.max, 10);
+      s.querySelectorAll('[data-dir="-1"]').forEach(b => b.disabled = val <= min);
+      s.querySelectorAll('[data-dir="1"]').forEach(b => b.disabled = val >= max);
+    });
+  }
+
+  function updateVolumeSliderFill() {
+    el.volumeSlider.style.setProperty('--vol', el.volumeSlider.value + '%');
+  }
+
+  function saveConfig() {
+    try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.config)); } catch (e) {}
+  }
+
+  function loadConfig() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+      if (saved && typeof saved === 'object') Object.assign(state.config, saved);
+    } catch (e) {}
+    setSegmentedActive(el.modeSeg, state.config.mode);
+    setSegmentedActive(el.timeSeg, state.config.timeSig);
+    setSegmentedActive(el.flashSeg, state.config.flash ? 'on' : 'off');
+    el.volumeSlider.value = Math.round(state.config.volume * 100);
+    el.volumeReadout.textContent = `${el.volumeSlider.value}%`;
+    updateVolumeSliderFill();
+    applyMode();
+    renderBeats();
+    updateAllStepperDisplays();
+    el.bpmNumber.textContent = state.config.tempo;
+  }
+
+  // ============================================================
+  //  EVENT WIRING
+  // ============================================================
+  el.playBtn.addEventListener('click', () => {
+    if (state.isPlaying) stop(); else start();
+  });
+
+  el.modeSeg.addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    state.config.mode = btn.dataset.value;
+    setSegmentedActive(el.modeSeg, state.config.mode);
+    applyMode();
+    saveConfig();
+  });
+
+  el.timeSeg.addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    state.config.timeSig = parseInt(btn.dataset.value, 10);
+    setSegmentedActive(el.timeSeg, state.config.timeSig);
+    renderBeats();
+    saveConfig();
+  });
+
+  el.flashSeg.addEventListener('click', e => {
+    const btn = e.target.closest('button');
+    if (!btn) return;
+    state.config.flash = btn.dataset.value === 'on';
+    setSegmentedActive(el.flashSeg, state.config.flash ? 'on' : 'off');
+    saveConfig();
+  });
+
+  el.volumeSlider.addEventListener('input', () => {
+    state.config.volume = parseInt(el.volumeSlider.value, 10) / 100;
+    el.volumeReadout.textContent = `${el.volumeSlider.value}%`;
+    updateVolumeSliderFill();
+  });
+  el.volumeSlider.addEventListener('change', saveConfig);
+
+  // Steppers: works while stopped (changes config) and during play (changes live tempo)
+  function attachStepper(stepper) {
+    const key = stepper.dataset.key;
+    const min = parseInt(stepper.dataset.min, 10);
+    const max = parseInt(stepper.dataset.max, 10);
+
+    function bump(dir, amount) {
+      const inc = amount * dir;
+
+      // Live tempo edit during play (only the tempo stepper)
+      if (key === 'tempo' && state.isPlaying) {
+        const next = clamp(state.currentBPM + inc, min, max);
+        if (next === state.currentBPM) return;
+        state.currentBPM = next;
+        // Rewrite queued notes' bpm so the display doesn't flicker through old values
+        state.notesInQueue.forEach(n => n.bpm = next);
+        el.bpmNumber.textContent = next;
+        updateAllStepperDisplays();
+        return;
+      }
+
+      // Stopped: change configured value
+      const next = clamp(state.config[key] + inc, min, max);
+      if (next === state.config[key]) return;
+      state.config[key] = next;
+      // Keep target ≥ start tempo
+      if ((key === 'tempo' || key === 'target') && state.config.target < state.config.tempo) {
+        state.config.target = state.config.tempo;
+      }
+      if (!state.isPlaying && key === 'tempo') {
+        el.bpmNumber.textContent = next;
+      }
+      updateAllStepperDisplays();
+      saveConfig();
+    }
+
+    stepper.querySelectorAll('.step-btn').forEach(btn => {
+      const dir = parseInt(btn.dataset.dir, 10);
+      const amount = parseInt(btn.dataset.amount, 10);
+      let holdTimeout, holdInterval;
+
+      function pressStart(e) {
+        e.preventDefault();
+        if (btn.disabled) return;
+        bump(dir, amount);
+        // Press-and-hold for fast repeat
+        holdTimeout = setTimeout(() => {
+          holdInterval = setInterval(() => {
+            if (btn.disabled) { pressEnd(); return; }
+            bump(dir, amount);
+          }, 100);
+        }, 450);
+      }
+      function pressEnd() {
+        clearTimeout(holdTimeout);
+        clearInterval(holdInterval);
+        holdTimeout = holdInterval = null;
+      }
+
+      btn.addEventListener('pointerdown', pressStart);
+      btn.addEventListener('pointerup', pressEnd);
+      btn.addEventListener('pointercancel', pressEnd);
+      btn.addEventListener('pointerleave', pressEnd);
+    });
+  }
+
+  document.querySelectorAll('.stepper').forEach(attachStepper);
+
+  // ============================================================
+  //  INIT
+  // ============================================================
+  loadConfig();
+})();
+</script>
+</body>
+</html>
