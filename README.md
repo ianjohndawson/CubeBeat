@@ -6,6 +6,10 @@ A metronome built specifically for drilling Rubik's cube algorithms.
 
 Set a tempo, mark the turns that should land on the click, and gradually ramp up speed without breaking the timing pattern. Single HTML file, works on iPad, iPhone and desktop.
 
+## Inspiration
+
+Built after watching a YouTube video by cubetrainer (https://www.youtube.com/watch?v=eQo8kiGi1x4) about metronome training for speedcubing — the idea that the brain coordinates complex sequences of movement by tracking time, and that giving an algorithm a time signature accelerates how quickly it gets internalised. Worth a search if the technique interests you.
+
 ## What it does
 
 Rather than drilling algorithms by raw repetition, drill them against a metronome. The clicks fall not on every turn, but on the *finishing* turns — typically U-face moves or wherever the algorithm naturally lands. Your brain learns when each muscle should fire and in what order, which builds fluid execution at speed rather than the brittle, jittery pattern that comes from blasting through algorithms as fast as you can.
@@ -29,15 +33,15 @@ CubeBeat is a tool for that drill, with a few quality-of-life features for cuber
 2. Tap the Share button → **Add to Home Screen**
 3. Tap the new icon — CubeBeat launches fullscreen with a dark theme
 
-If you're hosting on GitHub Pages, enable it under **Settings → Pages → Source: main / root**, and the URL will be `https://<your-username>.github.io/<repo-name>/cubebeat.html` (or just the repo root if you rename `cubebeat.html` to `index.html`).
+If you're hosting on GitHub Pages, enable it under **Settings → Pages → Source: main / root**, and the URL will be `https://ianjohndawson.github.io/CubeBeat/cubebeat.html`.
 
 > **iOS sound note:** Web Audio respects the device's silent / mute switch on iOS. If you can't hear clicks, check the side switch and the volume in Control Centre. CubeBeat includes a silent audio loop trick that bypasses the switch in most cases, but a fully muted device will still be silent.
 
 ## How the drill works
 
-Pick an algorithm — H-perm, J-perm, an OLL, whatever. Pick a time signature (4/4 is the usual). Identify which moves should land on the click — for many PLLs, that's the U-face turns.
+Pick an algorithm — H-perm, J-perm, an OLL, whatever. Pick a time signature (4/4 is the usual). Listen to the ticking while running through the algorithm and identify which moves feel like they should land on each click.
 
-Start slow — around 60 BPM. Execute the algorithm so the marked moves fall *on* the click, with the rest of the moves filling in between. Repeat for several bars without breaking the rhythm. Bump the tempo a little and repeat. Continue until you can't keep the marked moves on the click cleanly — that's your current ceiling for that algorithm. Practise around that ceiling.
+Once you have the rhythm start slow — around 60 BPM. Execute the algorithm so the marked moves fall *on* the click, with the rest of the moves filling in between. Repeat for several bars without breaking the rhythm. Bump the tempo a little and repeat. Continue until you can't keep the marked moves on the click cleanly — that's your current ceiling for that algorithm. Practise around that ceiling.
 
 **Worked example.** For H-perm in 4/4 time, each of the four U-face moves becomes an accent. At 60 BPM that gives you a comfortable second between accents — the rest of the algorithm has to slot in and complete by the time the next click arrives. As you ramp the tempo, the windows shrink and the algorithm has to become tighter and more deliberate.
 
@@ -81,10 +85,6 @@ python3 -m http.server 8000
 ```
 
 Then visit `http://localhost:8000/cubebeat.html`.
-
-## Inspiration
-
-Built after watching a YouTube video by cubetrainer (https://www.youtube.com/watch?v=eQo8kiGi1x4) about metronome training for speedcubing — the idea that the brain coordinates complex sequences of movement by tracking time, and that giving an algorithm a time signature accelerates how quickly it gets internalised. Worth a search if the technique interests you.
 
 ## License
 
