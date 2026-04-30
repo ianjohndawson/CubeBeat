@@ -8,6 +8,13 @@
 <meta name="apple-mobile-web-app-title" content="CubeBeat" />
 <meta name="theme-color" content="#0a0a0a" />
 <title>CubeBeat</title>
+
+<!-- Icon for browsers and "Add to Home Screen" on iOS.
+     The PNG file should sit alongside this HTML file. -->
+<link rel="apple-touch-icon" sizes="180x180" href="cubebeat-icon-180.png" />
+<link rel="apple-touch-icon-precomposed" sizes="180x180" href="cubebeat-icon-180.png" />
+<link rel="icon" type="image/png" sizes="180x180" href="cubebeat-icon-180.png" />
+
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..900;1,9..144,300..900&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet" />
@@ -96,10 +103,7 @@
   }
 
   /* ---------- HEADER ---------- */
-  header {
-    position: relative;
-    padding-bottom: 18px;
-  }
+  header { position: relative; padding-bottom: 18px; }
   header::after {
     content: '';
     position: absolute;
@@ -122,14 +126,9 @@
     align-items: center;
     gap: 16px;
   }
-  .brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+  .brand { display: flex; align-items: center; gap: 12px; }
   .brand-mark {
-    width: 30px;
-    height: 30px;
+    width: 30px; height: 30px;
     flex-shrink: 0;
     filter: drop-shadow(0 0 8px rgba(0, 0, 0, 0.5));
   }
@@ -152,32 +151,71 @@
     text-align: right;
     line-height: 1.4;
   }
-  .subtitle strong {
-    color: var(--accent);
-    font-weight: 500;
-  }
+  .subtitle strong { color: var(--accent); font-weight: 500; }
 
-  /* ---------- BPM DISPLAY ---------- */
-  .display {
-    text-align: center;
-    padding: 8px 0 4px;
-  }
+  /* ---------- BPM DISPLAY + INLINE BUTTONS ---------- */
+  .display { padding: 4px 0 4px; }
   .display-label {
+    text-align: center;
     font-size: 10px;
     letter-spacing: 0.32em;
     text-transform: uppercase;
     color: var(--text-faint);
-    margin-bottom: 8px;
+    margin-bottom: 10px;
   }
+  .tempo-row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .tempo-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .tempo-btn {
+    width: 56px;
+    height: 56px;
+    background: var(--bg-deep);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 600;
+    font-size: 15px;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    -webkit-appearance: none;
+    transition: all 0.1s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .tempo-btn:active {
+    background: var(--bg-elevated);
+    border-color: var(--text-dim);
+    color: var(--accent);
+  }
+  .tempo-btn:disabled {
+    color: var(--text-faint);
+    cursor: default;
+    border-color: var(--border);
+    background: transparent;
+  }
+
   .bpm-frame {
     position: relative;
-    display: inline-block;
-    padding: 14px 36px 10px;
+    padding: 10px 28px 6px;
+    flex: 1;
+    text-align: center;
+    min-width: 0;
   }
   .corner {
     position: absolute;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border: 0 solid var(--text-faint);
     transition: border-color 0.4s ease;
   }
@@ -191,7 +229,7 @@
     font-family: 'Fraunces', serif;
     font-weight: 300;
     font-style: italic;
-    font-size: clamp(110px, 30vw, 170px);
+    font-size: clamp(96px, 26vw, 160px);
     line-height: 0.9;
     letter-spacing: -0.05em;
     font-variant-numeric: tabular-nums;
@@ -209,6 +247,7 @@
     100% { transform: scale(1); }
   }
   .bpm-unit {
+    text-align: center;
     font-size: 11px;
     letter-spacing: 0.32em;
     text-transform: uppercase;
@@ -337,16 +376,11 @@
     color: var(--bg);
   }
 
-  /* ---------- STEPPERS ---------- */
+  /* ---------- RAMP STEPPERS ---------- */
   .stepper {
     display: grid;
     grid-template-columns: 72px 1fr 72px;
     gap: 10px;
-  }
-  /* 5-button variant for tempo */
-  .stepper-wide {
-    grid-template-columns: 1fr 1fr 1.6fr 1fr 1fr;
-    gap: 6px;
   }
   .step-btn {
     height: 64px;
@@ -364,13 +398,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  /* In the wide stepper, ±5 / ±1 use mono for a control-panel feel */
-  .stepper-wide .step-btn {
-    font-family: 'JetBrains Mono', monospace;
-    font-weight: 600;
-    font-size: 16px;
-    letter-spacing: 0.04em;
   }
   .step-btn:active {
     background: var(--bg-elevated);
@@ -397,60 +424,19 @@
     font-variant-numeric: tabular-nums;
     color: var(--text);
   }
-  /* Live-edit affordance: show stepper value glows when playing (it's controlling live tempo) */
-  body.is-playing .stepper-wide .step-value {
-    color: var(--accent);
-    border-color: rgba(245, 185, 66, 0.35);
-  }
-
-  /* ---------- VOLUME SLIDER ---------- */
-  .slider-wrap {
-    height: 64px;
-    display: flex;
-    align-items: center;
-    padding: 0 4px;
-  }
-  input[type="range"] {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 100%;
-    height: 6px;
-    background: var(--border);
-    border-radius: 3px;
-    outline: none;
-    background-image: linear-gradient(to right, var(--accent) 0%, var(--accent) var(--vol, 60%), var(--border) var(--vol, 60%), var(--border) 100%);
-  }
-  input[type="range"]::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    appearance: none;
-    width: 32px;
-    height: 32px;
-    background: var(--text);
-    border-radius: 50%;
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  }
-  input[type="range"]::-moz-range-thumb {
-    width: 32px;
-    height: 32px;
-    background: var(--text);
-    border-radius: 50%;
-    cursor: pointer;
-    border: none;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  }
 
   /* ---------- RAMP-ONLY VISIBILITY ---------- */
   .ramp-only { display: flex; flex-direction: column; gap: 18px; }
   .mode-steady .ramp-only { display: none; }
   .mode-steady .ramp-status { visibility: hidden; }
 
+  /* Highlight the BPM number when playing — it's the live tempo */
+  body.is-playing .bpm-number { color: var(--accent); }
+
   /* ---------- FLASH OVERLAY ---------- */
   .flash-overlay {
     position: fixed;
     inset: 0;
-    background: #ffffff;
     pointer-events: none;
     opacity: 0;
     z-index: 9999;
@@ -464,10 +450,7 @@
     gap: 12px;
     padding-top: 8px;
   }
-  .footer-stripe {
-    display: flex;
-    gap: 3px;
-  }
+  .footer-stripe { display: flex; gap: 3px; }
   .footer-stripe span {
     width: 8px;
     height: 8px;
@@ -491,16 +474,29 @@
   }
 
   @media (max-height: 720px) {
-    .bpm-number { font-size: clamp(80px, 22vw, 130px); }
+    .bpm-number { font-size: clamp(72px, 20vw, 120px); }
     .app { gap: 16px; padding: 14px 20px; }
     .step-btn, .step-value { height: 56px; }
     .play-btn { padding: 20px; }
     .title { font-size: 26px; }
+    .tempo-btn { width: 50px; height: 50px; }
+  }
+  /* Narrow phones — keep the tempo row from getting cramped */
+  @media (max-width: 380px) {
+    .tempo-buttons { gap: 6px; }
+    .tempo-btn { width: 48px; height: 48px; font-size: 14px; }
+    .tempo-row { gap: 6px; }
+    .bpm-frame { padding: 8px 14px 4px; }
   }
 </style>
 </head>
 <body class="mode-steady">
   <div class="flash-overlay" id="flashOverlay"></div>
+
+  <!-- Hidden silent audio loop. Used to bypass the iOS silent/mute switch
+       so the metronome clicks are still audible when the side switch is on. -->
+  <audio id="silentLoop" loop preload="auto" playsinline webkit-playsinline
+         src="data:audio/wav;base64,UklGRjUrAABXQVZFZm10IBAAAAABAAEAESsAABErAAABAAgAZGF0YRErAACAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgICAgIA="></audio>
 
   <div class="app">
     <header>
@@ -523,14 +519,25 @@
       </div>
     </header>
 
+    <!-- TEMPO display + flanking buttons -->
     <div class="display">
-      <div class="display-label">Tempo</div>
-      <div class="bpm-frame" id="bpmFrame">
-        <span class="corner tl"></span>
-        <span class="corner tr"></span>
-        <span class="corner bl"></span>
-        <span class="corner br"></span>
-        <div class="bpm-number" id="bpmNumber">60</div>
+      <div class="display-label" id="tempoLabel">Tempo</div>
+      <div class="tempo-row">
+        <div class="tempo-buttons">
+          <button class="tempo-btn" data-dir="-1" data-amount="5" aria-label="Decrease 5 BPM">&minus;5</button>
+          <button class="tempo-btn" data-dir="-1" data-amount="1" aria-label="Decrease 1 BPM">&minus;1</button>
+        </div>
+        <div class="bpm-frame" id="bpmFrame">
+          <span class="corner tl"></span>
+          <span class="corner tr"></span>
+          <span class="corner bl"></span>
+          <span class="corner br"></span>
+          <div class="bpm-number" id="bpmNumber">60</div>
+        </div>
+        <div class="tempo-buttons">
+          <button class="tempo-btn" data-dir="1" data-amount="5" aria-label="Increase 5 BPM">+5</button>
+          <button class="tempo-btn" data-dir="1" data-amount="1" aria-label="Increase 1 BPM">+1</button>
+        </div>
       </div>
       <div class="bpm-unit">Beats Per Minute</div>
     </div>
@@ -551,21 +558,6 @@
         </div>
       </div>
 
-      <!-- TEMPO (5-button stepper, also live-editable during play) -->
-      <div class="field">
-        <div class="field-header">
-          <span class="field-label" id="tempoLabel">Tempo</span>
-          <span class="field-unit">BPM</span>
-        </div>
-        <div class="stepper stepper-wide" data-key="tempo" data-min="20" data-max="400">
-          <button class="step-btn" data-dir="-1" data-amount="5">−5</button>
-          <button class="step-btn" data-dir="-1" data-amount="1">−1</button>
-          <span class="step-value">60</span>
-          <button class="step-btn" data-dir="1" data-amount="1">+1</button>
-          <button class="step-btn" data-dir="1" data-amount="5">+5</button>
-        </div>
-      </div>
-
       <!-- TIME -->
       <div class="field">
         <div class="field-header"><span class="field-label">Time</span></div>
@@ -583,7 +575,7 @@
             <span class="field-unit">BPM</span>
           </div>
           <div class="stepper" data-key="step" data-min="1" data-max="50">
-            <button class="step-btn" data-dir="-1" data-amount="1">−</button>
+            <button class="step-btn" data-dir="-1" data-amount="1">&minus;</button>
             <span class="step-value">5</span>
             <button class="step-btn" data-dir="1" data-amount="1">+</button>
           </div>
@@ -595,7 +587,7 @@
             <span class="field-unit">Bars</span>
           </div>
           <div class="stepper" data-key="every" data-min="1" data-max="32">
-            <button class="step-btn" data-dir="-1" data-amount="1">−</button>
+            <button class="step-btn" data-dir="-1" data-amount="1">&minus;</button>
             <span class="step-value">2</span>
             <button class="step-btn" data-dir="1" data-amount="1">+</button>
           </div>
@@ -607,7 +599,7 @@
             <span class="field-unit">BPM</span>
           </div>
           <div class="stepper" data-key="target" data-min="20" data-max="400">
-            <button class="step-btn" data-dir="-1" data-amount="5">−</button>
+            <button class="step-btn" data-dir="-1" data-amount="5">&minus;</button>
             <span class="step-value">240</span>
             <button class="step-btn" data-dir="1" data-amount="5">+</button>
           </div>
@@ -622,17 +614,6 @@
           <button data-value="on">On</button>
         </div>
       </div>
-
-      <!-- VOLUME -->
-      <div class="field">
-        <div class="field-header">
-          <span class="field-label">Volume</span>
-          <span class="field-unit" id="volumeReadout">60%</span>
-        </div>
-        <div class="slider-wrap">
-          <input type="range" id="volumeSlider" min="0" max="100" value="60" />
-        </div>
-      </div>
     </div>
 
     <div class="footer">
@@ -644,7 +625,7 @@
         <span style="background: var(--st-blue)"></span>
         <span style="background: var(--st-green)"></span>
       </div>
-      <div class="footer-text"><em>CubeBeat</em> · Built for Speedcubers</div>
+      <div class="footer-text"><em>CubeBeat</em> &middot; Built for Speedcubers</div>
     </div>
   </div>
 
@@ -657,21 +638,21 @@
   // ============================================================
   const state = {
     audioCtx: null,
+    audioUnlocked: false,
     isPlaying: false,
-    finalized: true,        // guard against double-finalisation
-    reachedTarget: false,   // set by ramp auto-stop; suppresses tempo save
+    finalized: true,
+    reachedTarget: false,
     currentBeat: 0,
     currentBar: 0,
     currentBPM: 60,
     config: {
       mode: 'steady',
       timeSig: 4,
-      tempo: 60,            // default start tempo (was 120)
+      tempo: 60,
       step: 5,
       every: 2,
       target: 240,
       flash: false,
-      volume: 0.6,
     },
     nextNoteTime: 0,
     timerID: null,
@@ -681,7 +662,13 @@
 
   const LOOKAHEAD_MS = 25;
   const SCHEDULE_AHEAD_S = 0.1;
-  const STORAGE_KEY = 'cubebeat.v4';
+  const STORAGE_KEY = 'cubebeat.v5';
+
+  // Flash colours (WCA-style red/green) — strong = downbeat, soft = off-beats
+  const FLASH_DOWNBEAT_COLOR = '#c8102e';
+  const FLASH_DOWNBEAT_OPACITY = '0.45';
+  const FLASH_OFFBEAT_COLOR = '#009b48';
+  const FLASH_OFFBEAT_OPACITY = '0.30';
 
   function clamp(v, lo, hi) { return Math.max(lo, Math.min(hi, v)); }
 
@@ -691,6 +678,7 @@
   const el = {
     body: document.body,
     flashOverlay: document.getElementById('flashOverlay'),
+    silentLoop: document.getElementById('silentLoop'),
     bpmNumber: document.getElementById('bpmNumber'),
     bpmFrame: document.getElementById('bpmFrame'),
     beats: document.getElementById('beats'),
@@ -700,19 +688,57 @@
     timeSeg: document.getElementById('timeSeg'),
     flashSeg: document.getElementById('flashSeg'),
     tempoLabel: document.getElementById('tempoLabel'),
-    volumeSlider: document.getElementById('volumeSlider'),
-    volumeReadout: document.getElementById('volumeReadout'),
   };
 
   // ============================================================
-  //  AUDIO
+  //  AUDIO — with iOS unlock dance
   // ============================================================
   function ensureAudioContext() {
     if (!state.audioCtx) {
       const Ctor = window.AudioContext || window.webkitAudioContext;
       state.audioCtx = new Ctor();
     }
-    if (state.audioCtx.state === 'suspended') state.audioCtx.resume();
+  }
+
+  // Must be called inside a user gesture (e.g. click handler).
+  // Performs the full iOS unlock procedure:
+  //   1) create / resume the Web Audio context
+  //   2) play a silent buffer to unlock Web Audio output
+  //   3) start a silent <audio> loop to bypass the iOS mute / silent switch
+  async function unlockAudio() {
+    ensureAudioContext();
+    const ctx = state.audioCtx;
+
+    if (ctx.state === 'suspended') {
+      try { await ctx.resume(); } catch (e) {}
+    }
+
+    // Web Audio unlock: schedule a silent 1-sample buffer
+    try {
+      const buffer = ctx.createBuffer(1, 1, 22050);
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(ctx.destination);
+      source.start(0);
+    } catch (e) {}
+
+    // Bypass iOS silent switch via an HTML5 audio loop.
+    // We set a very low (but non-zero) volume so iOS treats it as media.
+    try {
+      el.silentLoop.volume = 0.001;
+      el.silentLoop.muted = false;
+      el.silentLoop.currentTime = 0;
+      const playPromise = el.silentLoop.play();
+      if (playPromise && typeof playPromise.then === 'function') {
+        await playPromise.catch(() => {});
+      }
+    } catch (e) {}
+
+    state.audioUnlocked = true;
+  }
+
+  function pauseSilentLoop() {
+    try { el.silentLoop.pause(); } catch (e) {}
   }
 
   function scheduleClick(time, isDownbeat) {
@@ -723,7 +749,7 @@
     osc.type = 'sine';
     osc.frequency.setValueAtTime(isDownbeat ? 1500 : 850, time);
 
-    const peak = state.config.volume * (isDownbeat ? 0.6 : 0.4);
+    const peak = isDownbeat ? 0.65 : 0.45;
     gain.gain.setValueAtTime(0, time);
     gain.gain.linearRampToValueAtTime(peak, time + 0.001);
     gain.gain.exponentialRampToValueAtTime(0.0001, time + 0.05);
@@ -768,7 +794,6 @@
         state.currentBar = 0;
         const next = state.currentBPM + state.config.step;
         if (next > state.config.target) {
-          // Auto-stop: target reached. Stop scheduling new notes.
           state.reachedTarget = true;
           state.isPlaying = false;
           return;
@@ -800,7 +825,6 @@
       if (last.bpm !== shown) {
         el.bpmNumber.textContent = last.bpm;
         flashTempoChange();
-        updateAllStepperDisplays();
       }
       updateRampStatus(last.bar, last.bpm);
     }
@@ -821,7 +845,13 @@
 
   function flashScreen(strong) {
     el.flashOverlay.style.transition = 'none';
-    el.flashOverlay.style.opacity = strong ? '0.42' : '0.18';
+    if (strong) {
+      el.flashOverlay.style.background = FLASH_DOWNBEAT_COLOR;
+      el.flashOverlay.style.opacity = FLASH_DOWNBEAT_OPACITY;
+    } else {
+      el.flashOverlay.style.background = FLASH_OFFBEAT_COLOR;
+      el.flashOverlay.style.opacity = FLASH_OFFBEAT_OPACITY;
+    }
     void el.flashOverlay.offsetWidth;
     el.flashOverlay.style.transition = 'opacity 130ms ease-out';
     el.flashOverlay.style.opacity = '0';
@@ -850,7 +880,7 @@
       return;
     }
     const barsLeft = state.config.every - barIndex;
-    el.rampStatus.innerHTML = `Next <span class="arrow">→</span> ${next} BPM in ${barsLeft} bar${barsLeft === 1 ? '' : 's'}`;
+    el.rampStatus.innerHTML = 'Next <span class="arrow">&rarr;</span> ' + next + ' BPM in ' + barsLeft + ' bar' + (barsLeft === 1 ? '' : 's');
   }
 
   // ============================================================
@@ -858,13 +888,12 @@
   // ============================================================
   async function start() {
     if (state.isPlaying) return;
-    ensureAudioContext();
-    if (state.audioCtx.state === 'suspended') await state.audioCtx.resume();
+    await unlockAudio();
 
     state.currentBeat = 0;
     state.currentBar = 0;
     state.currentBPM = state.config.tempo;
-    state.nextNoteTime = state.audioCtx.currentTime + 0.08;
+    state.nextNoteTime = state.audioCtx.currentTime + 0.1;
     state.notesInQueue = [];
     state.reachedTarget = false;
     state.finalized = false;
@@ -874,7 +903,6 @@
     el.playBtn.textContent = 'Stop';
     el.playBtn.classList.add('playing');
     el.bpmNumber.textContent = state.currentBPM;
-    updateAllStepperDisplays();
 
     requestWakeLock();
     scheduler();
@@ -882,13 +910,10 @@
   }
 
   function stop() {
-    // User-initiated stop. Just set the flag; drawLoop will finalise.
     state.isPlaying = false;
     if (state.timerID) { clearTimeout(state.timerID); state.timerID = null; }
     state.notesInQueue = [];
-    // If no draw frame is pending, finalise directly
     if (state.finalized) return;
-    // Trigger one more frame so it gets to the finalise branch
     requestAnimationFrame(drawLoop);
   }
 
@@ -897,13 +922,15 @@
     state.finalized = true;
     state.isPlaying = false;
 
-    // Remember-where-stopped: save currentBPM as new start tempo,
-    // unless we auto-stopped at the target (start fresh next time).
+    // Remember-where-stopped: persist current BPM as the next start tempo,
+    // unless we auto-stopped at the ramp target.
     if (!state.reachedTarget && state.currentBPM !== state.config.tempo) {
       state.config.tempo = clamp(state.currentBPM, 20, 400);
       saveConfig();
     }
     state.reachedTarget = false;
+
+    pauseSilentLoop();
 
     el.body.classList.remove('is-playing');
     el.playBtn.textContent = 'Start';
@@ -911,7 +938,6 @@
     el.rampStatus.textContent = '';
     updateBeatLights(-1);
     el.bpmNumber.textContent = state.config.tempo;
-    updateAllStepperDisplays();
     releaseWakeLock();
   }
 
@@ -954,16 +980,10 @@
     });
   }
 
-  function effectiveValue(key) {
-    // Tempo stepper controls live BPM during play; otherwise reads config.
-    if (key === 'tempo' && state.isPlaying) return state.currentBPM;
-    return state.config[key];
-  }
-
   function updateAllStepperDisplays() {
     document.querySelectorAll('.stepper').forEach(s => {
       const key = s.dataset.key;
-      const val = effectiveValue(key);
+      const val = state.config[key];
       s.querySelector('.step-value').textContent = val;
       const min = parseInt(s.dataset.min, 10);
       const max = parseInt(s.dataset.max, 10);
@@ -972,8 +992,12 @@
     });
   }
 
-  function updateVolumeSliderFill() {
-    el.volumeSlider.style.setProperty('--vol', el.volumeSlider.value + '%');
+  function updateTempoButtonStates() {
+    const liveValue = state.isPlaying ? state.currentBPM : state.config.tempo;
+    document.querySelectorAll('.tempo-btn').forEach(b => {
+      const dir = parseInt(b.dataset.dir, 10);
+      b.disabled = (dir < 0 && liveValue <= 20) || (dir > 0 && liveValue >= 400);
+    });
   }
 
   function saveConfig() {
@@ -988,12 +1012,10 @@
     setSegmentedActive(el.modeSeg, state.config.mode);
     setSegmentedActive(el.timeSeg, state.config.timeSig);
     setSegmentedActive(el.flashSeg, state.config.flash ? 'on' : 'off');
-    el.volumeSlider.value = Math.round(state.config.volume * 100);
-    el.volumeReadout.textContent = `${el.volumeSlider.value}%`;
-    updateVolumeSliderFill();
     applyMode();
     renderBeats();
     updateAllStepperDisplays();
+    updateTempoButtonStates();
     el.bpmNumber.textContent = state.config.tempo;
   }
 
@@ -1030,14 +1052,58 @@
     saveConfig();
   });
 
-  el.volumeSlider.addEventListener('input', () => {
-    state.config.volume = parseInt(el.volumeSlider.value, 10) / 100;
-    el.volumeReadout.textContent = `${el.volumeSlider.value}%`;
-    updateVolumeSliderFill();
-  });
-  el.volumeSlider.addEventListener('change', saveConfig);
+  // Tempo buttons (flank the BPM display) — work both stopped and live
+  function attachTempoButton(btn) {
+    const dir = parseInt(btn.dataset.dir, 10);
+    const amount = parseInt(btn.dataset.amount, 10);
+    let holdTimeout, holdInterval;
 
-  // Steppers: works while stopped (changes config) and during play (changes live tempo)
+    function bump() {
+      const inc = dir * amount;
+      if (state.isPlaying) {
+        const next = clamp(state.currentBPM + inc, 20, 400);
+        if (next === state.currentBPM) return;
+        state.currentBPM = next;
+        // Rewrite queued notes' bpm so the display doesn't flicker through stale values
+        state.notesInQueue.forEach(n => n.bpm = next);
+        el.bpmNumber.textContent = next;
+      } else {
+        const next = clamp(state.config.tempo + inc, 20, 400);
+        if (next === state.config.tempo) return;
+        state.config.tempo = next;
+        if (state.config.target < state.config.tempo) state.config.target = state.config.tempo;
+        el.bpmNumber.textContent = next;
+        updateAllStepperDisplays();
+        saveConfig();
+      }
+      updateTempoButtonStates();
+    }
+
+    function pressStart(e) {
+      e.preventDefault();
+      if (btn.disabled) return;
+      bump();
+      holdTimeout = setTimeout(() => {
+        holdInterval = setInterval(() => {
+          if (btn.disabled) { pressEnd(); return; }
+          bump();
+        }, 100);
+      }, 450);
+    }
+    function pressEnd() {
+      clearTimeout(holdTimeout);
+      clearInterval(holdInterval);
+      holdTimeout = holdInterval = null;
+    }
+
+    btn.addEventListener('pointerdown', pressStart);
+    btn.addEventListener('pointerup', pressEnd);
+    btn.addEventListener('pointercancel', pressEnd);
+    btn.addEventListener('pointerleave', pressEnd);
+  }
+  document.querySelectorAll('.tempo-btn').forEach(attachTempoButton);
+
+  // Ramp steppers
   function attachStepper(stepper) {
     const key = stepper.dataset.key;
     const min = parseInt(stepper.dataset.min, 10);
@@ -1045,29 +1111,11 @@
 
     function bump(dir, amount) {
       const inc = amount * dir;
-
-      // Live tempo edit during play (only the tempo stepper)
-      if (key === 'tempo' && state.isPlaying) {
-        const next = clamp(state.currentBPM + inc, min, max);
-        if (next === state.currentBPM) return;
-        state.currentBPM = next;
-        // Rewrite queued notes' bpm so the display doesn't flicker through old values
-        state.notesInQueue.forEach(n => n.bpm = next);
-        el.bpmNumber.textContent = next;
-        updateAllStepperDisplays();
-        return;
-      }
-
-      // Stopped: change configured value
       const next = clamp(state.config[key] + inc, min, max);
       if (next === state.config[key]) return;
       state.config[key] = next;
-      // Keep target ≥ start tempo
-      if ((key === 'tempo' || key === 'target') && state.config.target < state.config.tempo) {
+      if (key === 'target' && state.config.target < state.config.tempo) {
         state.config.target = state.config.tempo;
-      }
-      if (!state.isPlaying && key === 'tempo') {
-        el.bpmNumber.textContent = next;
       }
       updateAllStepperDisplays();
       saveConfig();
@@ -1082,7 +1130,6 @@
         e.preventDefault();
         if (btn.disabled) return;
         bump(dir, amount);
-        // Press-and-hold for fast repeat
         holdTimeout = setTimeout(() => {
           holdInterval = setInterval(() => {
             if (btn.disabled) { pressEnd(); return; }
@@ -1102,7 +1149,6 @@
       btn.addEventListener('pointerleave', pressEnd);
     });
   }
-
   document.querySelectorAll('.stepper').forEach(attachStepper);
 
   // ============================================================
