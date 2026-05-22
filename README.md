@@ -25,7 +25,8 @@ CubeBeat is a tool for that drill, with a few quality-of-life features for cuber
 - **Inline tempo controls** — −5 / −1 / +1 / +5 buttons flanking the BPM display, with press-and-hold for fast change
 - **Live tempo adjust** — change BPM mid-drill without stopping
 - **Remembers where you left off** — pause practice, come back, pick up at the same BPM
-- **OLL / PLL case library** — pick a drill case, track which cases you've practised, filter by set
+- **Repetitions per minute** — one algorithm rep = one full bar; shown from BPM and 3/4 or 4/4 time
+- **OLL / PLL case library** — pick a drill case, track practised cases, save best BPM per case
 - **No build, no dependencies, no accounts, no servers** — open the HTML and go
 
 ## Quick start on iPad / iPhone

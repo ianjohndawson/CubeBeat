@@ -9,11 +9,10 @@
 <meta name="theme-color" content="#0a0a0a" />
 <title>CubeBeat</title>
 
-<!-- Icon for browsers and "Add to Home Screen" on iOS.
-     The PNG file should sit alongside this HTML file. -->
+<!-- icon.png is the source artwork; resized PNGs for home screen -->
+<link rel="icon" href="icon.png" />
 <link rel="apple-touch-icon" sizes="180x180" href="cubebeat-icon-180.png" />
-<link rel="apple-touch-icon-precomposed" sizes="180x180" href="cubebeat-icon-180.png" />
-<link rel="icon" type="image/png" sizes="180x180" href="cubebeat-icon-180.png" />
+<link rel="apple-touch-icon" sizes="512x512" href="cubebeat-icon-512.png" />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -178,6 +177,8 @@
   .tempo-btn {
     width: 56px;
     height: 56px;
+    min-width: 48px;
+    min-height: 48px;
     background: var(--bg-deep);
     border: 1px solid var(--border-strong);
     border-radius: 4px;
@@ -246,13 +247,19 @@
     55%  { transform: scale(1.025); }
     100% { transform: scale(1); }
   }
+  .tempo-meta { text-align: center; margin-top: 8px; }
   .bpm-unit {
-    text-align: center;
     font-size: 11px;
     letter-spacing: 0.32em;
     text-transform: uppercase;
     color: var(--text-faint);
-    margin-top: 6px;
+  }
+  .rpm-line {
+    margin-top: 10px;
+    font-size: 13px;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+    font-variant-numeric: tabular-nums;
   }
 
   /* ---------- BEAT INDICATOR ---------- */
@@ -306,6 +313,7 @@
     border: 1px solid var(--text);
     border-radius: 4px;
     padding: 24px;
+    min-height: 56px;
     cursor: pointer;
     transition: all 0.15s ease;
     -webkit-appearance: none;
@@ -357,6 +365,7 @@
   .segmented button {
     flex: 1;
     padding: 18px 12px;
+    min-height: 48px;
     background: transparent;
     border: none;
     color: var(--text-dim);
@@ -433,6 +442,78 @@
   /* Highlight the BPM number when playing — it's the live tempo */
   body.is-playing .bpm-number { color: var(--accent); }
 
+
+  /* ---------- CASE FOCUS + LIBRARY ---------- */
+  .case-focus-btn {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    padding: 18px 20px;
+    min-height: 56px;
+    background: var(--bg-deep);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    cursor: pointer;
+    -webkit-appearance: none;
+    text-align: left;
+  }
+  .case-focus-btn:active { border-color: var(--accent); background: var(--bg-elevated); }
+  .case-focus-main { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+  .case-focus-label { font-size: 10px; letter-spacing: 0.28em; text-transform: uppercase; color: var(--text-faint); }
+  .case-focus-value {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 500; font-size: 20px;
+    color: var(--accent); text-align: right; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .case-focus-value.empty {
+    color: var(--text-dim); font-size: 14px; font-family: 'JetBrains Mono', monospace;
+    font-style: normal; font-weight: 400;
+  }
+  .case-focus-stats { font-size: 11px; color: var(--text-dim); font-variant-numeric: tabular-nums; }
+  .library-overlay {
+    position: fixed; inset: 0; z-index: 100; background: var(--bg);
+    display: none; flex-direction: column;
+    padding: calc(18px + var(--safe-top)) 24px calc(24px + var(--safe-bottom)); gap: 18px;
+  }
+  .library-overlay.open { display: flex; }
+  .library-header { display: flex; gap: 12px; }
+  .library-filter {
+    flex: 1; min-height: 52px; background: var(--bg-deep); color: var(--text);
+    border: 1px solid var(--border-strong); border-radius: 4px; padding: 14px 16px;
+    font-family: 'JetBrains Mono', monospace; font-size: 15px; -webkit-appearance: none;
+  }
+  .library-close {
+    width: 56px; min-height: 52px; background: var(--bg-deep); border: 1px solid var(--border-strong);
+    border-radius: 4px; color: var(--text-dim); font-size: 22px; cursor: pointer; -webkit-appearance: none;
+  }
+  .library-progress {
+    display: flex; justify-content: space-between; font-size: 11px;
+    letter-spacing: 0.2em; text-transform: uppercase; color: var(--text-faint);
+  }
+  .library-progress strong { color: var(--accent); }
+  .library-list { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; display: flex; flex-direction: column; gap: 10px; }
+  .library-divider {
+    padding: 16px 4px 8px; font-size: 10px; letter-spacing: 0.28em;
+    text-transform: uppercase; color: var(--accent); border-bottom: 1px solid var(--border);
+  }
+  .library-item {
+    display: flex; align-items: center; justify-content: space-between; gap: 14px;
+    padding: 16px 18px; min-height: 56px; background: var(--bg-deep);
+    border: 1px solid var(--border); border-radius: 4px; cursor: pointer;
+  }
+  .library-item.focused { border-color: var(--text-dim); }
+  .library-item.practised { border-color: var(--accent-dim); background: rgba(245, 185, 66, 0.06); }
+  .lib-record { display: block; margin-top: 4px; font-size: 11px; color: var(--text-dim); }
+  .library-tick {
+    width: 48px; height: 48px; flex-shrink: 0; border: 1.5px solid var(--border-strong);
+    border-radius: 4px; display: flex; align-items: center; justify-content: center;
+    color: var(--accent); font-size: 18px; font-weight: 700;
+  }
+  .library-item.practised .library-tick { border-color: var(--accent); background: rgba(245, 185, 66, 0.12); }
+
   /* ---------- FLASH OVERLAY ---------- */
   .flash-overlay {
     position: fixed;
@@ -471,6 +552,20 @@
     letter-spacing: 0;
     font-size: 12px;
     color: var(--text-dim);
+  }
+
+
+  @media (min-width: 768px) {
+    .app { max-width: 680px; padding: 28px 36px 44px; gap: 26px; }
+    .tempo-btn { width: 72px; height: 72px; font-size: 17px; }
+    .play-btn { padding: 28px; min-height: 64px; }
+    .segmented button { padding: 22px 16px; min-height: 56px; }
+    .step-btn, .step-value { height: 72px; }
+    .case-focus-btn { padding: 22px 24px; min-height: 72px; }
+    .library-tick { width: 52px; height: 52px; }
+    .library-item { min-height: 64px; }
+    .beat { width: 28px; height: 28px; }
+    .rpm-line { font-size: 15px; }
   }
 
   @media (max-height: 720px) {
@@ -539,12 +634,23 @@
           <button class="tempo-btn" data-dir="1" data-amount="1" aria-label="Increase 1 BPM">+1</button>
         </div>
       </div>
-      <div class="bpm-unit">Beats Per Minute</div>
+      <div class="tempo-meta">
+        <div class="bpm-unit">Beats Per Minute</div>
+        <div class="rpm-line" id="rpmLine">15.0 reps / min</div>
+      </div>
     </div>
 
     <div class="beats" id="beats"></div>
 
     <div class="ramp-status" id="rampStatus"></div>
+
+    <button type="button" class="case-focus-btn" id="openLibraryBtn" aria-haspopup="dialog" aria-controls="libraryOverlay">
+      <div class="case-focus-main">
+        <span class="case-focus-label">Drill case</span>
+        <span class="case-focus-value empty" id="focusValue">Choose case</span>
+      </div>
+      <span class="case-focus-stats" id="focusStats">Tap to open case library</span>
+    </button>
 
     <button class="play-btn" id="playBtn">Start</button>
 
@@ -653,6 +759,9 @@
       every: 2,
       target: 240,
       flash: false,
+      focusCase: '',
+      practised: [],
+      caseRecords: {},
     },
     nextNoteTime: 0,
     timerID: null,
@@ -662,7 +771,27 @@
 
   const LOOKAHEAD_MS = 25;
   const SCHEDULE_AHEAD_S = 0.1;
-  const STORAGE_KEY = 'cubebeat.v5';
+  const STORAGE_KEY = 'cubebeat.v6';
+  const LEGACY_STORAGE_KEY = 'cubebeat.v5';
+  const LEGACY_PRACTISED_KEY = 'cubePractised';
+
+  const PLL_ALGOS = [
+    { n: 'Aa', g: 'Adj' }, { n: 'Ab', g: 'Adj' }, { n: 'E', g: 'Corn' }, { n: 'F', g: 'Adj' },
+    { n: 'Ga', g: 'G' }, { n: 'Gb', g: 'G' }, { n: 'Gc', g: 'G' }, { n: 'Gd', g: 'G' },
+    { n: 'H', g: 'Edge' }, { n: 'Ja', g: 'Adj' }, { n: 'Jb', g: 'Adj' }, { n: 'Na', g: 'Adj' },
+    { n: 'Nb', g: 'Adj' }, { n: 'Ra', g: 'Adj' }, { n: 'Rb', g: 'Adj' }, { n: 'T', g: 'Adj' },
+    { n: 'Ua', g: 'Edge' }, { n: 'Ub', g: 'Edge' }, { n: 'V', g: 'Adj' }, { n: 'Y', g: 'Adj' },
+    { n: 'Z', g: 'Edge' },
+  ];
+  const OLL_NAMES = [...new Set([
+    'T', 'P', 'Breakneck', "Seein' Headlights", 'Key', 'Ant', 'Mounted Fish', 'Big Lightning',
+    'Sune', 'Anti-Sune', 'Cross', 'Chameleon', 'Bowtie', 'Bruno', 'Headlights', 'Arrow', 'H',
+    'Lightning', 'Downstairs', 'Couch', 'Upstairs', 'Poodle', 'WTF', 'Anti-Poodle', 'Anti-WTF',
+    'Blank', 'Slash', 'Bunny', 'Anti-Nazi', 'Zamboni', 'Crown', 'X', 'Fish Salad', 'Frying Pan',
+    'Front Squeezy', 'Kite', 'Anti-Kite', 'Anti-Breakneck', 'Anti-Frying Pan', 'Back Squeezy',
+    'Mario', 'Wario', 'Rice Cooker', 'Streetlights', 'Squeegee', 'Gun', 'Highway', 'Anti-Squeegee',
+    'Anti-Gun', 'Righty-Square', 'Lefty-Square', 'Lefty Big Lightning', 'Inverse P', 'Anti-Couch', 'City',
+  ])].sort((a, b) => a.localeCompare(b));
 
   // Flash colours (WCA-style red/green) — strong = downbeat, soft = off-beats
   const FLASH_DOWNBEAT_COLOR = '#c8102e';
@@ -688,7 +817,27 @@
     timeSeg: document.getElementById('timeSeg'),
     flashSeg: document.getElementById('flashSeg'),
     tempoLabel: document.getElementById('tempoLabel'),
+    rpmLine: document.getElementById('rpmLine'),
+    focusValue: document.getElementById('focusValue'),
+    focusStats: document.getElementById('focusStats'),
+    openLibraryBtn: document.getElementById('openLibraryBtn'),
+    libraryOverlay: document.getElementById('libraryOverlay'),
+    closeLibraryBtn: document.getElementById('closeLibraryBtn'),
+    libraryFilter: document.getElementById('libraryFilter'),
+    libraryList: document.getElementById('libraryList'),
+    pllProgress: document.getElementById('pllProgress'),
+    ollProgress: document.getElementById('ollProgress'),
   };
+
+  function repsPerMin(bpm, timeSig) { return bpm / timeSig; }
+  function formatRpm(bpm, timeSig) {
+    return repsPerMin(bpm, timeSig).toFixed(1) + ' reps / min';
+  }
+  function updateRpmDisplay(bpm) {
+    const live = bpm != null ? bpm : (state.isPlaying ? state.currentBPM : state.config.tempo);
+    const sig = state.config.timeSig;
+    el.rpmLine.textContent = formatRpm(live, sig) + ' · 1 rep = ' + sig + '/4 bar';
+  }
 
   // ============================================================
   //  AUDIO — with iOS unlock dance
@@ -796,6 +945,7 @@
         if (next > state.config.target) {
           state.reachedTarget = true;
           state.isPlaying = false;
+          if (state.config.focusCase) recordCaseResult(state.config.focusCase, state.currentBPM);
           return;
         }
         state.currentBPM = next;
@@ -825,6 +975,7 @@
       if (last.bpm !== shown) {
         el.bpmNumber.textContent = last.bpm;
         flashTempoChange();
+        updateRpmDisplay(last.bpm);
       }
       updateRampStatus(last.bar, last.bpm);
     }
@@ -1000,6 +1151,105 @@
     });
   }
 
+
+  function caseId(type, name) { return type + ' ' + name; }
+  function parseCaseId(id) {
+    const space = id.indexOf(' ');
+    if (space < 0) return { type: '', name: id };
+    return { type: id.slice(0, space), name: id.slice(space + 1) };
+  }
+  function recordCaseResult(caseKey, bpm) {
+    if (!caseKey) return;
+    const bpmClamped = clamp(Math.round(bpm), 20, 400);
+    const prev = state.config.caseRecords[caseKey] || {};
+    state.config.caseRecords[caseKey] = {
+      lastBpm: bpmClamped,
+      bestBpm: prev.bestBpm ? Math.max(prev.bestBpm, bpmClamped) : bpmClamped,
+      timeSig: state.config.timeSig,
+      updated: new Date().toISOString(),
+    };
+    saveConfig();
+    updateFocusDisplay();
+    if (el.libraryOverlay.classList.contains('open')) renderLibrary();
+  }
+  function formatCaseRecord(rec) {
+    if (!rec) return '';
+    const sig = rec.timeSig || state.config.timeSig;
+    return 'Best ' + rec.bestBpm + ' BPM · ' + formatRpm(rec.bestBpm, sig);
+  }
+  function updateFocusDisplay() {
+    if (!state.config.focusCase) {
+      el.focusValue.textContent = 'Choose case';
+      el.focusValue.classList.add('empty');
+      el.focusStats.textContent = 'Tap to open case library';
+      return;
+    }
+    const { type, name } = parseCaseId(state.config.focusCase);
+    el.focusValue.textContent = type + ' · ' + name;
+    el.focusValue.classList.remove('empty');
+    const rec = state.config.caseRecords[state.config.focusCase];
+    el.focusStats.textContent = rec ? formatCaseRecord(rec) : 'No best tempo saved yet';
+  }
+  function updateLibraryProgress() {
+    const pllDone = state.config.practised.filter(id => id.startsWith('PLL ')).length;
+    const ollDone = state.config.practised.filter(id => id.startsWith('OLL ')).length;
+    el.pllProgress.textContent = pllDone + ' / ' + PLL_ALGOS.length;
+    el.ollProgress.textContent = ollDone + ' / ' + OLL_NAMES.length;
+  }
+  function renderLibrary() {
+    const filter = el.libraryFilter.value;
+    let html = '';
+    function row(id, title, sub, rec) {
+      const done = state.config.practised.includes(id);
+      const focused = state.config.focusCase === id;
+      const recLine = rec ? '<span class="lib-record">' + formatCaseRecord(rec) + '</span>' : '';
+      return '<div class="library-item' + (done ? ' practised' : '') + (focused ? ' focused' : '') + '" data-id="' + id.replace(/"/g, '&quot;') + '">' +
+        '<div><div class="library-item-name">' + title + (sub || '') + recLine + '</div></div>' +
+        '<div class="library-tick" data-action="toggle">' + (done ? '✓' : '') + '</div></div>';
+    }
+    if (filter === 'ALL' || filter === 'PLL') {
+      html += '<div class="library-divider">PLL</div>';
+      PLL_ALGOS.forEach(a => {
+        const id = caseId('PLL', a.n);
+        html += row(id, '<strong>' + a.n + '</strong>', '<small>' + a.g + '</small>', state.config.caseRecords[id]);
+      });
+    }
+    if (filter === 'ALL' || filter === 'OLL') {
+      html += '<div class="library-divider">OLL</div>';
+      OLL_NAMES.forEach(name => {
+        const id = caseId('OLL', name);
+        html += row(id, '<strong>' + name + '</strong>', '', state.config.caseRecords[id]);
+      });
+    }
+    el.libraryList.innerHTML = html;
+    updateLibraryProgress();
+  }
+  function setLibraryOpen(open) {
+    el.libraryOverlay.classList.toggle('open', open);
+    el.libraryOverlay.setAttribute('aria-hidden', open ? 'false' : 'true');
+    if (open) renderLibrary();
+  }
+  function togglePractised(id) {
+    const list = state.config.practised;
+    state.config.practised = list.includes(id) ? list.filter(x => x !== id) : [...list, id];
+    saveConfig();
+    renderLibrary();
+  }
+  function selectFocusCase(id) {
+    state.config.focusCase = id;
+    saveConfig();
+    updateFocusDisplay();
+    setLibraryOpen(false);
+  }
+  function migrateLegacyStorage() {
+    if (!state.config.practised.length) {
+      try {
+        const legacy = JSON.parse(localStorage.getItem(LEGACY_PRACTISED_KEY));
+        if (Array.isArray(legacy)) state.config.practised = legacy;
+      } catch (e) {}
+    }
+  }
+
   function saveConfig() {
     try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state.config)); } catch (e) {}
   }
@@ -1016,7 +1266,12 @@
     renderBeats();
     updateAllStepperDisplays();
     updateTempoButtonStates();
+    if (!Array.isArray(state.config.practised)) state.config.practised = [];
+    if (!state.config.caseRecords || typeof state.config.caseRecords !== 'object') state.config.caseRecords = {};
+    if (typeof state.config.focusCase !== 'string') state.config.focusCase = '';
+    migrateLegacyStorage();
     el.bpmNumber.textContent = state.config.tempo;
+    updateRpmDisplay(state.config.tempo);
     updateFocusDisplay();
     updateLibraryProgress();
   }
@@ -1027,17 +1282,12 @@
   el.openLibraryBtn.addEventListener('click', () => setLibraryOpen(true));
   el.closeLibraryBtn.addEventListener('click', () => setLibraryOpen(false));
   el.libraryFilter.addEventListener('change', renderLibrary);
-
   el.libraryList.addEventListener('click', e => {
     const tick = e.target.closest('[data-action="toggle"]');
     const row = e.target.closest('.library-item');
     if (!row) return;
     const id = row.dataset.id;
-    if (tick) {
-      e.stopPropagation();
-      togglePractised(id);
-      return;
-    }
+    if (tick) { e.stopPropagation(); togglePractised(id); return; }
     selectFocusCase(id);
   });
 
@@ -1060,6 +1310,7 @@
     state.config.timeSig = parseInt(btn.dataset.value, 10);
     setSegmentedActive(el.timeSeg, state.config.timeSig);
     renderBeats();
+    updateRpmDisplay();
     saveConfig();
   });
 
@@ -1086,12 +1337,14 @@
         // Rewrite queued notes' bpm so the display doesn't flicker through stale values
         state.notesInQueue.forEach(n => n.bpm = next);
         el.bpmNumber.textContent = next;
+        updateRpmDisplay(next);
       } else {
         const next = clamp(state.config.tempo + inc, 20, 400);
         if (next === state.config.tempo) return;
         state.config.tempo = next;
         if (state.config.target < state.config.tempo) state.config.target = state.config.tempo;
         el.bpmNumber.textContent = next;
+        updateRpmDisplay(next);
         updateAllStepperDisplays();
         saveConfig();
       }
