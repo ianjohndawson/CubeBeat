@@ -1017,11 +1017,30 @@
     updateAllStepperDisplays();
     updateTempoButtonStates();
     el.bpmNumber.textContent = state.config.tempo;
+    updateFocusDisplay();
+    updateLibraryProgress();
   }
 
   // ============================================================
   //  EVENT WIRING
   // ============================================================
+  el.openLibraryBtn.addEventListener('click', () => setLibraryOpen(true));
+  el.closeLibraryBtn.addEventListener('click', () => setLibraryOpen(false));
+  el.libraryFilter.addEventListener('change', renderLibrary);
+
+  el.libraryList.addEventListener('click', e => {
+    const tick = e.target.closest('[data-action="toggle"]');
+    const row = e.target.closest('.library-item');
+    if (!row) return;
+    const id = row.dataset.id;
+    if (tick) {
+      e.stopPropagation();
+      togglePractised(id);
+      return;
+    }
+    selectFocusCase(id);
+  });
+
   el.playBtn.addEventListener('click', () => {
     if (state.isPlaying) stop(); else start();
   });
