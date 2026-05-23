@@ -588,6 +588,23 @@
 <body class="mode-steady">
   <div class="flash-overlay" id="flashOverlay"></div>
 
+  <div class="library-overlay" id="libraryOverlay" role="dialog" aria-label="Algorithm library" aria-hidden="true">
+    <div class="library-header">
+      <select class="library-filter" id="libraryFilter" aria-label="Filter cases">
+        <option value="ALL">All cases</option>
+        <option value="PLL">PLL only</option>
+        <option value="OLL">OLL only</option>
+      </select>
+      <button type="button" class="library-close" id="closeLibraryBtn" aria-label="Close library">&times;</button>
+    </div>
+    <div class="library-progress">
+      <span>PLL <strong id="pllProgress">0 / 21</strong></span>
+      <span>OLL <strong id="ollProgress">0 / 55</strong></span>
+    </div>
+    <div class="library-list" id="libraryList"></div>
+  </div>
+
+
   <!-- Hidden silent audio loop. Used to bypass the iOS silent/mute switch
        so the metronome clicks are still audible when the side switch is on. -->
   <audio id="silentLoop" loop preload="auto" playsinline webkit-playsinline
@@ -1225,6 +1242,7 @@
     updateLibraryProgress();
   }
   function setLibraryOpen(open) {
+    if (!el.libraryOverlay) return;
     el.libraryOverlay.classList.toggle('open', open);
     el.libraryOverlay.setAttribute('aria-hidden', open ? 'false' : 'true');
     if (open) renderLibrary();
