@@ -564,6 +564,7 @@
   }
   .library-item.focused { border-color: var(--text-dim); }
   .library-item.practised { border-color: var(--accent-dim); background: rgba(245, 185, 66, 0.06); }
+  .lib-group { display: block; margin-top: 5px; font-size: 10px; color: var(--text-faint); letter-spacing: 0.06em; }
   .lib-record { display: block; margin-top: 4px; font-size: 11px; color: var(--text-dim); }
   .library-tick {
     width: 48px; height: 48px; flex-shrink: 0; border: 1.5px solid var(--border-strong);
@@ -1389,6 +1390,16 @@
   }
 
 
+
+  const CMLL_GROUP_SUFFIX = {
+    'O Cases': 'O', 'H Cases': 'H', 'Pi Cases': 'Pi', 'U Cases': 'U', 'T Cases': 'T',
+    'Sune Cases': 'S', 'Antisune Cases': 'AS', 'L Cases': 'L',
+  };
+  function cmllListLabel(a) {
+    const suffix = CMLL_GROUP_SUFFIX[a.g] || a.g.replace(/ Cases$/, '');
+    return a.n + ' – ' + suffix;
+  }
+
   function caseId(type, name) { return type + ' ' + name; }
 
   function caseDisplayLabel(id) {
@@ -1397,6 +1408,11 @@
       const o = OLL_ALGOS.find(x => x.num === name);
       if (o) return 'OLL ' + o.num + ' – ' + o.name;
     }
+    if (type === 'CMLL') {
+      const c = CMLL_ALGOS.find(x => x.n === name);
+      if (c) return cmllListLabel(c);
+    }
+    if (type === 'PLL') return name;
     return type + ' · ' + name;
   }
 
@@ -1457,33 +1473,33 @@
     const filter = el.libraryFilter.value;
     let html = '';
     function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
-    function row(id, title, sub, rec) {
+    function row(id, labelHtml, rec) {
       const done = state.config.practised.includes(id);
       const focused = state.config.focusCase === id;
       const recLine = rec ? '<span class="lib-record">' + formatCaseRecord(rec) + '</span>' : '';
       return '<div class="library-item' + (done ? ' practised' : '') + (focused ? ' focused' : '') + '" data-id="' + esc(id) + '">' +
-        '<div class="library-item-main" data-action="select"><div class="library-item-name">' + title + (sub || '') + recLine + '</div></div>' +
+        '<div class="library-item-main" data-action="select"><div class="library-item-name">' + labelHtml + recLine + '</div></div>' +
         '<div class="library-tick" data-action="practised" aria-label="Mark practised">' + (done ? '✓' : '') + '</div></div>';
-    }
+  }
     if (filter === 'ALL' || filter === 'PLL') {
       html += '<div class="library-divider">PLL</div>';
       PLL_ALGOS.forEach(a => {
         const id = caseId('PLL', a.n);
-        html += row(id, '<strong>' + esc(a.n) + '</strong>', '<small>' + esc(a.g) + '</small>', state.config.caseRecords[id]);
+        html += row(id, '<strong>' + esc(a.n) + '</strong><small class="lib-group">' + esc(a.g) + '</small>', state.config.caseRecords[id]);
       });
     }
     if (filter === 'ALL' || filter === 'OLL') {
       html += '<div class="library-divider">OLL</div>';
       OLL_ALGOS.forEach(a => {
         const id = caseId('OLL', a.num);
-        html += row(id, '<strong>OLL ' + esc(a.num) + ' – ' + esc(a.name) + '</strong>', '<small>' + esc(a.g) + '</small>', state.config.caseRecords[id]);
+        html += row(id, '<strong>OLL ' + esc(a.num) + ' – ' + esc(a.name) + '</strong><small class="lib-group">' + esc(a.g) + '</small>', state.config.caseRecords[id]);
       });
     }
     if (filter === 'ALL' || filter === 'CMLL') {
       html += '<div class="library-divider">CMLL</div>';
       CMLL_ALGOS.forEach(a => {
         const id = caseId('CMLL', a.n);
-        html += row(id, '<strong>' + esc(a.n) + '</strong>', '<small>' + esc(a.g) + '</small>', state.config.caseRecords[id]);
+        html += row(id, '<strong>' + esc(cmllListLabel(a)) + '</strong>', state.config.caseRecords[id]);
       });
     }
     el.libraryList.innerHTML = html;
