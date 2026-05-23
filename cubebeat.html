@@ -287,6 +287,37 @@
   .save-case-btn.ready { border-color: var(--accent-dim); color: var(--accent); }
   .save-case-btn.ready:active { background: rgba(245, 185, 66, 0.12); border-color: var(--accent); }
   .save-case-btn:disabled { opacity: 0.4; cursor: default; }
+  .case-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .clear-case-btn {
+    min-height: 52px;
+    padding: 16px 12px;
+    background: var(--bg-deep);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+  .clear-case-btn.ready {
+    border-color: #5a2828;
+    color: #e07070;
+  }
+  .clear-case-btn.ready:active {
+    background: rgba(200, 16, 46, 0.12);
+    border-color: #c8102e;
+  }
+  .clear-case-btn:disabled { opacity: 0.35; cursor: default; }
+  .library-progress { flex-wrap: wrap; gap: 8px 16px; }
+  .library-item-main { flex: 1; min-width: 0; }
   .save-case-btn.saved { border-color: var(--accent); color: var(--text); background: rgba(245, 185, 66, 0.15); }
 
   /* ---------- BEAT INDICATOR ---------- */
@@ -593,7 +624,8 @@
     .library-item { min-height: 64px; }
     .beat { width: 28px; height: 28px; }
     .rpm-line { font-size: 15px; }
-    .save-case-btn { min-height: 56px; }
+    .case-actions { gap: 12px; }
+    .save-case-btn, .clear-case-btn { min-height: 56px; }
     .spam-seconds { font-size: 13px; }
   }
 
@@ -623,12 +655,14 @@
         <option value="ALL">All cases</option>
         <option value="PLL">PLL only</option>
         <option value="OLL">OLL only</option>
+        <option value="CMLL">CMLL only</option>
       </select>
       <button type="button" class="library-close" id="closeLibraryBtn" aria-label="Close library">&times;</button>
     </div>
     <div class="library-progress">
       <span>PLL <strong id="pllProgress">0 / 21</strong></span>
-      <span>OLL <strong id="ollProgress">0 / 55</strong></span>
+      <span>OLL <strong id="ollProgress">0 / 57</strong></span>
+      <span>CMLL <strong id="cmllProgress">0 / 42</strong></span>
     </div>
     <div class="library-list" id="libraryList"></div>
   </div>
@@ -699,7 +733,10 @@
       <span class="case-focus-stats" id="focusStats">Tap to open case library</span>
     </button>
 
-    <button type="button" class="save-case-btn" id="saveCaseBtn" disabled>Save tempo to case</button>
+    <div class="case-actions">
+      <button type="button" class="save-case-btn" id="saveCaseBtn" disabled>Save tempo to case</button>
+      <button type="button" class="clear-case-btn" id="clearCaseBtn" disabled>Clear saved BPM</button>
+    </div>
 
     <button class="play-btn" id="playBtn">Start</button>
 
@@ -824,25 +861,52 @@
   const LEGACY_STORAGE_KEY = 'cubebeat.v5';
   const LEGACY_PRACTISED_KEY = 'cubePractised';
 
-  const PLL_ALGOS = [
-    { n: 'Aa', g: 'Adj' }, { n: 'Ab', g: 'Adj' }, { n: 'E', g: 'Corn' }, { n: 'F', g: 'Adj' },
-    { n: 'Ga', g: 'G' }, { n: 'Gb', g: 'G' }, { n: 'Gc', g: 'G' }, { n: 'Gd', g: 'G' },
-    { n: 'H', g: 'Edge' }, { n: 'Ja', g: 'Adj' }, { n: 'Jb', g: 'Adj' }, { n: 'Na', g: 'Adj' },
-    { n: 'Nb', g: 'Adj' }, { n: 'Ra', g: 'Adj' }, { n: 'Rb', g: 'Adj' }, { n: 'T', g: 'Adj' },
-    { n: 'Ua', g: 'Edge' }, { n: 'Ub', g: 'Edge' }, { n: 'V', g: 'Adj' }, { n: 'Y', g: 'Adj' },
-    { n: 'Z', g: 'Edge' },
+const PLL_ALGOS = [
+    { n: 'Aa', g: 'Adjacent' }, { n: 'Ab', g: 'Adjacent' },
+    { n: 'E', g: 'Corners' }, { n: 'F', g: 'Adjacent' },
+    { n: 'Ga', g: 'G Perm' }, { n: 'Gb', g: 'G Perm' }, { n: 'Gc', g: 'G Perm' }, { n: 'Gd', g: 'G Perm' },
+    { n: 'H', g: 'Edges' },
+    { n: 'Ja', g: 'Adjacent' }, { n: 'Jb', g: 'Adjacent' },
+    { n: 'Na', g: 'Adjacent' }, { n: 'Nb', g: 'Adjacent' },
+    { n: 'Ra', g: 'Adjacent' }, { n: 'Rb', g: 'Adjacent' },
+    { n: 'T', g: 'Adjacent' },
+    { n: 'Ua', g: 'Edges' }, { n: 'Ub', g: 'Edges' },
+    { n: 'V', g: 'Adjacent' }, { n: 'Y', g: 'Adjacent' },
+    { n: 'Z', g: 'Edges' },
   ];
-  const OLL_NAMES = [...new Set([
-    'T', 'P', 'Breakneck', "Seein' Headlights", 'Key', 'Ant', 'Mounted Fish', 'Big Lightning',
-    'Sune', 'Anti-Sune', 'Cross', 'Chameleon', 'Bowtie', 'Bruno', 'Headlights', 'Arrow', 'H',
-    'Lightning', 'Downstairs', 'Couch', 'Upstairs', 'Poodle', 'WTF', 'Anti-Poodle', 'Anti-WTF',
-    'Blank', 'Slash', 'Bunny', 'Anti-Nazi', 'Zamboni', 'Crown', 'X', 'Fish Salad', 'Frying Pan',
-    'Front Squeezy', 'Kite', 'Anti-Kite', 'Anti-Breakneck', 'Anti-Frying Pan', 'Back Squeezy',
-    'Mario', 'Wario', 'Rice Cooker', 'Streetlights', 'Squeegee', 'Gun', 'Highway', 'Anti-Squeegee',
-    'Anti-Gun', 'Righty-Square', 'Lefty-Square', 'Lefty Big Lightning', 'Inverse P', 'Anti-Couch', 'City',
-  ])].sort((a, b) => a.localeCompare(b));
 
-  // Flash colours (WCA-style red/green) — strong = downbeat, soft = off-beats
+  const OLL_SHAPE = {
+    1:'Dot',2:'Dot',3:'Dot',4:'Dot',5:'Square',6:'Square',7:'Lightning',8:'Lightning',
+    9:'Fish',10:'Fish',11:'Lightning',12:'Lightning',13:'Knight',14:'Knight',15:'Knight',16:'Knight',
+    17:'Dot',18:'Dot',19:'Dot',20:'Dot',21:'Cross',22:'Fork',23:'Fork',24:'Fork',25:'Fork',
+    26:'Anti-Sune',27:'Sune',28:'OCLL',57:'OCLL',29:'Awkward',30:'Awkward',31:'P',32:'P',
+    33:'C',34:'C',35:'Fish',36:'Fish',37:'Fish',38:'Fish',39:'Square',40:'Square',
+    41:'Awkward',42:'Awkward',43:'P',44:'P',45:'C',46:'C',47:'I',48:'I',49:'W',50:'W',
+    51:'C',52:'C',53:'I',54:'I',55:'C',56:'C',
+  };
+  const OLL_ALGOS = Array.from({ length: 57 }, (_, i) => {
+    const n = String(i + 1);
+    return { n, g: OLL_SHAPE[i + 1] || 'OLL' };
+  });
+
+  const CMLL_ALGOS = [
+    { n: 'O Adjacent', g: 'Oriented' }, { n: 'O Diagonal', g: 'Oriented' },
+    { n: 'O Headlights L', g: 'Oriented' }, { n: 'O Headlights R', g: 'Oriented' },
+    { n: 'O Column', g: 'Oriented' }, { n: 'O Row', g: 'Oriented' }, { n: 'O Opposite', g: 'Oriented' },
+    { n: 'H', g: 'H' }, { n: 'H Columns', g: 'H' }, { n: 'H Rows', g: 'H' }, { n: 'H Right', g: 'H' },
+    { n: 'Pi', g: 'Pi' }, { n: 'Pi Back', g: 'Pi' }, { n: 'Pi Left', g: 'Pi' },
+    { n: 'Pi Right', g: 'Pi' }, { n: 'Bruno', g: 'Pi' }, { n: 'Wheel', g: 'Pi' },
+    { n: 'L', g: 'L' }, { n: 'L Back', g: 'L' }, { n: 'L Left', g: 'L' },
+    { n: 'L Right', g: 'L' }, { n: 'L Narrow', g: 'L' }, { n: 'L Wide', g: 'L' },
+    { n: 'T', g: 'T' }, { n: 'T Back', g: 'T' }, { n: 'T Left', g: 'T' },
+    { n: 'T Right', g: 'T' }, { n: 'T Front', g: 'T' }, { n: 'T Opposite', g: 'T' },
+    { n: 'Sune', g: 'S' }, { n: 'Anti-Sune', g: 'S' }, { n: 'Sledge', g: 'S' }, { n: 'Hedge', g: 'S' },
+    { n: 'Back Sune', g: 'S' }, { n: 'Back Anti-Sune', g: 'S' },
+    { n: 'Ua', g: 'U' }, { n: 'Ub', g: 'U' }, { n: 'U', g: 'U' },
+    { n: 'U Back', g: 'U' }, { n: 'U Left', g: 'U' }, { n: 'U Right', g: 'U' },
+  ];
+
+    // Flash colours (WCA-style red/green) — strong = downbeat, soft = off-beats
   const FLASH_DOWNBEAT_COLOR = '#c8102e';
   const FLASH_DOWNBEAT_OPACITY = '0.45';
   const FLASH_OFFBEAT_COLOR = '#009b48';
@@ -869,6 +933,8 @@
     rpmLine: document.getElementById('rpmLine'),
     spamSeconds: document.getElementById('spamSeconds'),
     saveCaseBtn: document.getElementById('saveCaseBtn'),
+    clearCaseBtn: document.getElementById('clearCaseBtn'),
+    cmllProgress: document.getElementById('cmllProgress'),
     focusValue: document.getElementById('focusValue'),
     focusStats: document.getElementById('focusStats'),
     openLibraryBtn: document.getElementById('openLibraryBtn'),
@@ -897,21 +963,29 @@
     const sig = state.config.timeSig;
     el.rpmLine.textContent = formatSpamRate(live, sig);
     if (el.spamSeconds) el.spamSeconds.textContent = formatSpamDuration(live, sig);
-    updateSaveCaseButtonState();
+    updateCaseActionButtons();
   }
-  function updateSaveCaseButtonState() {
-    if (!el.saveCaseBtn) return;
-    el.saveCaseBtn.classList.remove('saved');
-    if (!state.config.focusCase) {
-      el.saveCaseBtn.disabled = true;
-      el.saveCaseBtn.classList.remove('ready');
-      el.saveCaseBtn.textContent = 'Save tempo to case (choose a case first)';
-      return;
+  function updateCaseActionButtons() {
+    if (el.saveCaseBtn) {
+      el.saveCaseBtn.classList.remove('saved');
+      if (!state.config.focusCase) {
+        el.saveCaseBtn.disabled = true;
+        el.saveCaseBtn.classList.remove('ready');
+        el.saveCaseBtn.textContent = 'Save tempo (pick a case)';
+      } else {
+        el.saveCaseBtn.disabled = false;
+        el.saveCaseBtn.classList.add('ready');
+        el.saveCaseBtn.textContent = 'Save ' + getLiveBpm() + ' BPM';
+      }
     }
-    el.saveCaseBtn.disabled = false;
-    el.saveCaseBtn.classList.add('ready');
-    el.saveCaseBtn.textContent = 'Save ' + getLiveBpm() + ' BPM to this case';
+    if (el.clearCaseBtn) {
+      const rec = state.config.focusCase && state.config.caseRecords[state.config.focusCase];
+      el.clearCaseBtn.disabled = !rec;
+      el.clearCaseBtn.classList.toggle('ready', !!rec);
+      el.clearCaseBtn.textContent = rec ? 'Clear saved BPM' : 'No saved BPM';
+    }
   }
+  function updateSaveCaseButtonState() { updateCaseActionButtons(); }
 
   // ============================================================
   //  AUDIO — with iOS unlock dance
@@ -1236,6 +1310,15 @@
     if (space < 0) return { type: '', name: id };
     return { type: id.slice(0, space), name: id.slice(space + 1) };
   }
+  function clearCaseRecord(caseKey) {
+    if (!caseKey || !state.config.caseRecords[caseKey]) return;
+    delete state.config.caseRecords[caseKey];
+    saveConfig();
+    updateFocusDisplay();
+    updateCaseActionButtons();
+    if (el.libraryOverlay && el.libraryOverlay.classList.contains('open')) renderLibrary();
+  }
+
   function recordCaseResult(caseKey, bpm) {
     if (!caseKey) return;
     const bpmClamped = clamp(Math.round(bpm), 20, 400);
@@ -1271,32 +1354,42 @@
   function updateLibraryProgress() {
     const pllDone = state.config.practised.filter(id => id.startsWith('PLL ')).length;
     const ollDone = state.config.practised.filter(id => id.startsWith('OLL ')).length;
+    const cmllDone = state.config.practised.filter(id => id.startsWith('CMLL ')).length;
     el.pllProgress.textContent = pllDone + ' / ' + PLL_ALGOS.length;
-    el.ollProgress.textContent = ollDone + ' / ' + OLL_NAMES.length;
+    el.ollProgress.textContent = ollDone + ' / ' + OLL_ALGOS.length;
+    if (el.cmllProgress) el.cmllProgress.textContent = cmllDone + ' / ' + CMLL_ALGOS.length;
   }
   function renderLibrary() {
     const filter = el.libraryFilter.value;
     let html = '';
+    function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
     function row(id, title, sub, rec) {
       const done = state.config.practised.includes(id);
       const focused = state.config.focusCase === id;
       const recLine = rec ? '<span class="lib-record">' + formatCaseRecord(rec) + '</span>' : '';
-      return '<div class="library-item' + (done ? ' practised' : '') + (focused ? ' focused' : '') + '" data-id="' + id.replace(/"/g, '&quot;') + '">' +
-        '<div><div class="library-item-name">' + title + (sub || '') + recLine + '</div></div>' +
-        '<div class="library-tick" data-action="toggle">' + (done ? '✓' : '') + '</div></div>';
+      return '<div class="library-item' + (done ? ' practised' : '') + (focused ? ' focused' : '') + '" data-id="' + esc(id) + '">' +
+        '<div class="library-item-main" data-action="select"><div class="library-item-name">' + title + (sub || '') + recLine + '</div></div>' +
+        '<div class="library-tick" data-action="practised" aria-label="Mark practised">' + (done ? '✓' : '') + '</div></div>';
     }
     if (filter === 'ALL' || filter === 'PLL') {
-      html += '<div class="library-divider">PLL</div>';
+      html += '<div class="library-divider">PLL · Permutation of Last Layer</div>';
       PLL_ALGOS.forEach(a => {
         const id = caseId('PLL', a.n);
-        html += row(id, '<strong>' + a.n + '</strong>', '<small>' + a.g + '</small>', state.config.caseRecords[id]);
+        html += row(id, '<strong>' + esc(a.n) + '</strong>', '<small>' + esc(a.g) + '</small>', state.config.caseRecords[id]);
       });
     }
     if (filter === 'ALL' || filter === 'OLL') {
-      html += '<div class="library-divider">OLL</div>';
-      OLL_NAMES.forEach(name => {
-        const id = caseId('OLL', name);
-        html += row(id, '<strong>' + name + '</strong>', '', state.config.caseRecords[id]);
+      html += '<div class="library-divider">OLL · Orientation of Last Layer</div>';
+      OLL_ALGOS.forEach(a => {
+        const id = caseId('OLL', a.n);
+        html += row(id, '<strong>OLL ' + esc(a.n) + '</strong>', '<small>' + esc(a.g) + '</small>', state.config.caseRecords[id]);
+      });
+    }
+    if (filter === 'ALL' || filter === 'CMLL') {
+      html += '<div class="library-divider">CMLL · Corners of Last Layer (M-Slice Free)</div>';
+      CMLL_ALGOS.forEach(a => {
+        const id = caseId('CMLL', a.n);
+        html += row(id, '<strong>' + esc(a.n) + '</strong>', '<small>' + esc(a.g) + '</small>', state.config.caseRecords[id]);
       });
     }
     el.libraryList.innerHTML = html;
@@ -1310,16 +1403,23 @@
   }
   function togglePractised(id) {
     const list = state.config.practised;
-    state.config.practised = list.includes(id) ? list.filter(x => x !== id) : [...list, id];
+    const removing = list.includes(id);
+    state.config.practised = removing ? list.filter(x => x !== id) : [...list, id];
+    if (removing && state.config.focusCase === id) {
+      state.config.focusCase = '';
+      updateFocusDisplay();
+      updateCaseActionButtons();
+    }
     saveConfig();
     renderLibrary();
   }
   function selectFocusCase(id) {
-    state.config.focusCase = id;
+    state.config.focusCase = state.config.focusCase === id ? '' : id;
     saveConfig();
     updateFocusDisplay();
-    updateSaveCaseButtonState();
-    setLibraryOpen(false);
+    updateCaseActionButtons();
+    if (state.config.focusCase) setLibraryOpen(false);
+    else renderLibrary();
   }
   function migrateLegacyStorage() {
     if (!state.config.practised.length) {
@@ -1354,7 +1454,7 @@
     updateRpmDisplay(state.config.tempo);
     updateFocusDisplay();
     updateLibraryProgress();
-    updateSaveCaseButtonState();
+    updateCaseActionButtons();
   }
 
   // ============================================================
@@ -1365,14 +1465,19 @@
     recordCaseResult(state.config.focusCase, getLiveBpm());
     el.saveCaseBtn.classList.add('saved');
     el.saveCaseBtn.textContent = 'Saved ' + getLiveBpm() + ' BPM';
-    setTimeout(updateSaveCaseButtonState, 1500);
+    setTimeout(updateCaseActionButtons, 1500);
+  });
+
+  el.clearCaseBtn.addEventListener('click', () => {
+    if (!state.config.focusCase) return;
+    clearCaseRecord(state.config.focusCase);
   });
 
   el.openLibraryBtn.addEventListener('click', () => setLibraryOpen(true));
   el.closeLibraryBtn.addEventListener('click', () => setLibraryOpen(false));
   el.libraryFilter.addEventListener('change', renderLibrary);
   el.libraryList.addEventListener('click', e => {
-    const tick = e.target.closest('[data-action="toggle"]');
+    const tick = e.target.closest('[data-action="practised"]');
     const row = e.target.closest('.library-item');
     if (!row) return;
     const id = row.dataset.id;
