@@ -261,6 +261,33 @@
     color: var(--accent);
     font-variant-numeric: tabular-nums;
   }
+  .spam-seconds {
+    margin-top: 6px;
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    color: var(--text-dim);
+    font-variant-numeric: tabular-nums;
+  }
+  .save-case-btn {
+    width: 100%;
+    min-height: 52px;
+    padding: 16px 18px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-strong);
+    border-radius: 4px;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    -webkit-appearance: none;
+  }
+  .save-case-btn.ready { border-color: var(--accent-dim); color: var(--accent); }
+  .save-case-btn.ready:active { background: rgba(245, 185, 66, 0.12); border-color: var(--accent); }
+  .save-case-btn:disabled { opacity: 0.4; cursor: default; }
+  .save-case-btn.saved { border-color: var(--accent); color: var(--text); background: rgba(245, 185, 66, 0.15); }
 
   /* ---------- BEAT INDICATOR ---------- */
   .beats {
@@ -566,6 +593,8 @@
     .library-item { min-height: 64px; }
     .beat { width: 28px; height: 28px; }
     .rpm-line { font-size: 15px; }
+    .save-case-btn { min-height: 56px; }
+    .spam-seconds { font-size: 13px; }
   }
 
   @media (max-height: 720px) {
@@ -653,7 +682,8 @@
       </div>
       <div class="tempo-meta">
         <div class="bpm-unit">Beats Per Minute</div>
-        <div class="rpm-line" id="rpmLine">15.0 reps / min</div>
+        <div class="rpm-line" id="rpmLine">15.0 spam / min</div>
+        <div class="spam-seconds" id="spamSeconds">1 spam = 4.00 sec</div>
       </div>
     </div>
 
@@ -668,6 +698,8 @@
       </div>
       <span class="case-focus-stats" id="focusStats">Tap to open case library</span>
     </button>
+
+    <button type="button" class="save-case-btn" id="saveCaseBtn" disabled>Save tempo to case</button>
 
     <button class="play-btn" id="playBtn">Start</button>
 
@@ -835,6 +867,8 @@
     flashSeg: document.getElementById('flashSeg'),
     tempoLabel: document.getElementById('tempoLabel'),
     rpmLine: document.getElementById('rpmLine'),
+    spamSeconds: document.getElementById('spamSeconds'),
+    saveCaseBtn: document.getElementById('saveCaseBtn'),
     focusValue: document.getElementById('focusValue'),
     focusStats: document.getElementById('focusStats'),
     openLibraryBtn: document.getElementById('openLibraryBtn'),
@@ -846,14 +880,37 @@
     ollProgress: document.getElementById('ollProgress'),
   };
 
-  function repsPerMin(bpm, timeSig) { return bpm / timeSig; }
-  function formatRpm(bpm, timeSig) {
-    return repsPerMin(bpm, timeSig).toFixed(1) + ' reps / min';
+  function spamPerMin(bpm, timeSig) { return bpm / timeSig; }
+  function secondsPerSpam(bpm, timeSig) { return (60 * timeSig) / bpm; }
+  function formatSpamRate(bpm, timeSig) {
+    return spamPerMin(bpm, timeSig).toFixed(1) + ' spam / min';
+  }
+  function formatSpamDuration(bpm, timeSig) {
+    const sec = secondsPerSpam(bpm, timeSig);
+    return '1 spam = ' + sec.toFixed(sec >= 10 ? 1 : 2) + ' sec';
+  }
+  function getLiveBpm() {
+    return state.isPlaying ? state.currentBPM : state.config.tempo;
   }
   function updateRpmDisplay(bpm) {
-    const live = bpm != null ? bpm : (state.isPlaying ? state.currentBPM : state.config.tempo);
+    const live = bpm != null ? bpm : getLiveBpm();
     const sig = state.config.timeSig;
-    el.rpmLine.textContent = formatRpm(live, sig) + ' · 1 rep = ' + sig + '/4 bar';
+    el.rpmLine.textContent = formatSpamRate(live, sig);
+    if (el.spamSeconds) el.spamSeconds.textContent = formatSpamDuration(live, sig);
+    updateSaveCaseButtonState();
+  }
+  function updateSaveCaseButtonState() {
+    if (!el.saveCaseBtn) return;
+    el.saveCaseBtn.classList.remove('saved');
+    if (!state.config.focusCase) {
+      el.saveCaseBtn.disabled = true;
+      el.saveCaseBtn.classList.remove('ready');
+      el.saveCaseBtn.textContent = 'Save tempo to case (choose a case first)';
+      return;
+    }
+    el.saveCaseBtn.disabled = false;
+    el.saveCaseBtn.classList.add('ready');
+    el.saveCaseBtn.textContent = 'Save ' + getLiveBpm() + ' BPM to this case';
   }
 
   // ============================================================
@@ -1096,6 +1153,9 @@
       state.config.tempo = clamp(state.currentBPM, 20, 400);
       saveConfig();
     }
+    if (state.config.focusCase) {
+      recordCaseResult(state.config.focusCase, state.currentBPM);
+    }
     state.reachedTarget = false;
 
     pauseSilentLoop();
@@ -1106,6 +1166,7 @@
     el.rampStatus.textContent = '';
     updateBeatLights(-1);
     el.bpmNumber.textContent = state.config.tempo;
+    updateRpmDisplay(state.config.tempo);
     releaseWakeLock();
   }
 
@@ -1192,7 +1253,7 @@
   function formatCaseRecord(rec) {
     if (!rec) return '';
     const sig = rec.timeSig || state.config.timeSig;
-    return 'Best ' + rec.bestBpm + ' BPM · ' + formatRpm(rec.bestBpm, sig);
+    return 'Best ' + rec.bestBpm + ' BPM · ' + formatSpamRate(rec.bestBpm, sig) + ' · ' + formatSpamDuration(rec.bestBpm, sig);
   }
   function updateFocusDisplay() {
     if (!state.config.focusCase) {
@@ -1205,7 +1266,7 @@
     el.focusValue.textContent = type + ' · ' + name;
     el.focusValue.classList.remove('empty');
     const rec = state.config.caseRecords[state.config.focusCase];
-    el.focusStats.textContent = rec ? formatCaseRecord(rec) : 'No best tempo saved yet';
+    el.focusStats.textContent = rec ? formatCaseRecord(rec) : 'Tap Save below after a clean drill';
   }
   function updateLibraryProgress() {
     const pllDone = state.config.practised.filter(id => id.startsWith('PLL ')).length;
@@ -1257,6 +1318,7 @@
     state.config.focusCase = id;
     saveConfig();
     updateFocusDisplay();
+    updateSaveCaseButtonState();
     setLibraryOpen(false);
   }
   function migrateLegacyStorage() {
@@ -1292,11 +1354,20 @@
     updateRpmDisplay(state.config.tempo);
     updateFocusDisplay();
     updateLibraryProgress();
+    updateSaveCaseButtonState();
   }
 
   // ============================================================
   //  EVENT WIRING
   // ============================================================
+  el.saveCaseBtn.addEventListener('click', () => {
+    if (!state.config.focusCase) return;
+    recordCaseResult(state.config.focusCase, getLiveBpm());
+    el.saveCaseBtn.classList.add('saved');
+    el.saveCaseBtn.textContent = 'Saved ' + getLiveBpm() + ' BPM';
+    setTimeout(updateSaveCaseButtonState, 1500);
+  });
+
   el.openLibraryBtn.addEventListener('click', () => setLibraryOpen(true));
   el.closeLibraryBtn.addEventListener('click', () => setLibraryOpen(false));
   el.libraryFilter.addEventListener('change', renderLibrary);
