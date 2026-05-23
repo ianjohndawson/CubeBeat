@@ -716,7 +716,7 @@
       </div>
       <div class="tempo-meta">
         <div class="bpm-unit">Beats Per Minute</div>
-        <div class="rpm-line" id="rpmLine">15.0 spam / min</div>
+        <div class="rpm-line" id="rpmLine">15.0 spams / min</div>
         <div class="spam-seconds" id="spamSeconds">1 spam = 4.00 sec</div>
       </div>
     </div>
@@ -861,52 +861,137 @@
   const LEGACY_STORAGE_KEY = 'cubebeat.v5';
   const LEGACY_PRACTISED_KEY = 'cubePractised';
 
-const PLL_ALGOS = [
-    { n: 'Aa', g: 'Adjacent' }, { n: 'Ab', g: 'Adjacent' },
-    { n: 'E', g: 'Corners' }, { n: 'F', g: 'Adjacent' },
-    { n: 'Ga', g: 'G Perm' }, { n: 'Gb', g: 'G Perm' }, { n: 'Gc', g: 'G Perm' }, { n: 'Gd', g: 'G Perm' },
-    { n: 'H', g: 'Edges' },
-    { n: 'Ja', g: 'Adjacent' }, { n: 'Jb', g: 'Adjacent' },
-    { n: 'Na', g: 'Adjacent' }, { n: 'Nb', g: 'Adjacent' },
-    { n: 'Ra', g: 'Adjacent' }, { n: 'Rb', g: 'Adjacent' },
-    { n: 'T', g: 'Adjacent' },
-    { n: 'Ua', g: 'Edges' }, { n: 'Ub', g: 'Edges' },
-    { n: 'V', g: 'Adjacent' }, { n: 'Y', g: 'Adjacent' },
-    { n: 'Z', g: 'Edges' },
-  ];
+// Reference fragment — embedded into cubebeat.html by patch script
+  const PLL_ALGOS = [
+  { n: 'Ua perm', g: 'Edge Permutations' },
+  { n: 'Ub perm', g: 'Edge Permutations' },
+  { n: 'Z perm', g: 'Edge Permutations' },
+  { n: 'H perm', g: 'Edge Permutations' },
+  { n: 'Aa perm', g: 'Corner Permutations' },
+  { n: 'Ab perm', g: 'Corner Permutations' },
+  { n: 'E perm', g: 'Corner Permutations' },
+  { n: 'T perm', g: 'Corner & Edge Swap' },
+  { n: 'F perm', g: 'Corner & Edge Swap' },
+  { n: 'Ja perm', g: 'Corner & Edge Swap' },
+  { n: 'Jb perm', g: 'Corner & Edge Swap' },
+  { n: 'Ra perm', g: 'Corner & Edge Swap' },
+  { n: 'Rb perm', g: 'Corner & Edge Swap' },
+  { n: 'V perm', g: 'Corner & Edge Swap' },
+  { n: 'Y perm', g: 'Corner & Edge Swap' },
+  { n: 'Na perm', g: 'Corner & Edge Swap' },
+  { n: 'Nb perm', g: 'Corner & Edge Swap' },
+  { n: 'Ga perm', g: 'Corner & Edge Cycle' },
+  { n: 'Gb perm', g: 'Corner & Edge Cycle' },
+  { n: 'Gc perm', g: 'Corner & Edge Cycle' },
+  { n: 'Gd perm', g: 'Corner & Edge Cycle' },
+];
 
-  const OLL_SHAPE = {
-    1:'Dot',2:'Dot',3:'Dot',4:'Dot',5:'Square',6:'Square',7:'Lightning',8:'Lightning',
-    9:'Fish',10:'Fish',11:'Lightning',12:'Lightning',13:'Knight',14:'Knight',15:'Knight',16:'Knight',
-    17:'Dot',18:'Dot',19:'Dot',20:'Dot',21:'Cross',22:'Fork',23:'Fork',24:'Fork',25:'Fork',
-    26:'Anti-Sune',27:'Sune',28:'OCLL',57:'OCLL',29:'Awkward',30:'Awkward',31:'P',32:'P',
-    33:'C',34:'C',35:'Fish',36:'Fish',37:'Fish',38:'Fish',39:'Square',40:'Square',
-    41:'Awkward',42:'Awkward',43:'P',44:'P',45:'C',46:'C',47:'I',48:'I',49:'W',50:'W',
-    51:'C',52:'C',53:'I',54:'I',55:'C',56:'C',
-  };
-  const OLL_ALGOS = Array.from({ length: 57 }, (_, i) => {
-    const n = String(i + 1);
-    return { n, g: OLL_SHAPE[i + 1] || 'OLL' };
-  });
+  const OLL_ALGOS = [
+  { num: '26', name: 'Sune', g: 'Oriented Edges' },
+  { num: '27', name: 'Anti-Sune', g: 'Oriented Edges' },
+  { num: '21', name: 'Cross', g: 'Oriented Edges' },
+  { num: '22', name: 'Bruno', g: 'Oriented Edges' },
+  { num: '24', name: 'Chameleon', g: 'Oriented Edges' },
+  { num: '25', name: 'Bowtie', g: 'Oriented Edges' },
+  { num: '23', name: 'Headlights', g: 'Oriented Edges' },
+  { num: '33', name: 'Key', g: 'T Shapes' },
+  { num: '45', name: 'T', g: 'T Shapes' },
+  { num: '6', name: 'Righty-Square', g: 'Squares' },
+  { num: '5', name: 'Lefty-Square', g: 'Squares' },
+  { num: '28', name: 'Arrow', g: 'Solved Corners' },
+  { num: '57', name: 'H', g: 'Solved Corners' },
+  { num: '40', name: 'Big Lightning', g: 'Big Lightning Bolts' },
+  { num: '39', name: 'Lefty Big Lightning', g: 'Big Lightning Bolts' },
+  { num: '7', name: 'Lightning', g: 'Small Lightning Bolts' },
+  { num: '8', name: 'Reverse Lightning', g: 'Small Lightning Bolts' },
+  { num: '12', name: 'Upstairs', g: 'Small Lightning Bolts' },
+  { num: '11', name: 'Downstairs', g: 'Small Lightning Bolts' },
+  { num: '31', name: 'Couch', g: 'P Shapes' },
+  { num: '32', name: 'Anti-Couch', g: 'P Shapes' },
+  { num: '44', name: 'P', g: 'P Shapes' },
+  { num: '43', name: 'Inverse P', g: 'P Shapes' },
+  { num: '46', name: "Seein' Headlights", g: 'C Shapes' },
+  { num: '34', name: 'City', g: 'C Shapes' },
+  { num: '9', name: 'Kite', g: 'Fishes' },
+  { num: '10', name: 'Anti-Kite', g: 'Fishes' },
+  { num: '35', name: 'Fish Salad', g: 'Fishes' },
+  { num: '37', name: 'Mounted Fish', g: 'Fishes' },
+  { num: '48', name: 'Breakneck', g: 'L Shapes' },
+  { num: '47', name: 'Anti-Breakneck', g: 'L Shapes' },
+  { num: '53', name: 'Frying Pan', g: 'L Shapes' },
+  { num: '54', name: 'Anti-Frying Pan', g: 'L Shapes' },
+  { num: '49', name: 'Back Squeezy', g: 'L Shapes' },
+  { num: '50', name: 'Front Squeezy', g: 'L Shapes' },
+  { num: '36', name: 'Wario', g: 'W Shapes' },
+  { num: '38', name: 'Mario', g: 'W Shapes' },
+  { num: '51', name: 'Ant', g: 'Lines' },
+  { num: '56', name: 'Streetlights', g: 'Lines' },
+  { num: '52', name: 'Rice Cooker', g: 'Lines' },
+  { num: '55', name: 'Highway', g: 'Lines' },
+  { num: '13', name: 'Gun', g: 'Knight Moves' },
+  { num: '14', name: 'Anti-Gun', g: 'Knight Moves' },
+  { num: '15', name: 'Squeeze', g: 'Knight Moves' },
+  { num: '16', name: 'Anti-Squeeze', g: 'Knight Moves' },
+  { num: '29', name: 'WTF', g: 'Awkward Shapes' },
+  { num: '30', name: 'Anti-WTF', g: 'Awkward Shapes' },
+  { num: '41', name: 'Poodle', g: 'Awkward Shapes' },
+  { num: '42', name: 'Anti-Poodle', g: 'Awkward Shapes' },
+  { num: '1', name: 'Blank', g: 'Dots' },
+  { num: '2', name: 'Tractor', g: 'Dots' },
+  { num: '4', name: 'Nazi', g: 'Dots' },
+  { num: '3', name: 'Anti-Nazi', g: 'Dots' },
+  { num: '17', name: 'Slash', g: 'Dots' },
+  { num: '20', name: 'X', g: 'Dots' },
+  { num: '18', name: 'Crown', g: 'Dots' },
+  { num: '19', name: 'Bunny', g: 'Dots' },
+];
 
   const CMLL_ALGOS = [
-    { n: 'O Adjacent', g: 'Oriented' }, { n: 'O Diagonal', g: 'Oriented' },
-    { n: 'O Headlights L', g: 'Oriented' }, { n: 'O Headlights R', g: 'Oriented' },
-    { n: 'O Column', g: 'Oriented' }, { n: 'O Row', g: 'Oriented' }, { n: 'O Opposite', g: 'Oriented' },
-    { n: 'H', g: 'H' }, { n: 'H Columns', g: 'H' }, { n: 'H Rows', g: 'H' }, { n: 'H Right', g: 'H' },
-    { n: 'Pi', g: 'Pi' }, { n: 'Pi Back', g: 'Pi' }, { n: 'Pi Left', g: 'Pi' },
-    { n: 'Pi Right', g: 'Pi' }, { n: 'Bruno', g: 'Pi' }, { n: 'Wheel', g: 'Pi' },
-    { n: 'L', g: 'L' }, { n: 'L Back', g: 'L' }, { n: 'L Left', g: 'L' },
-    { n: 'L Right', g: 'L' }, { n: 'L Narrow', g: 'L' }, { n: 'L Wide', g: 'L' },
-    { n: 'T', g: 'T' }, { n: 'T Back', g: 'T' }, { n: 'T Left', g: 'T' },
-    { n: 'T Right', g: 'T' }, { n: 'T Front', g: 'T' }, { n: 'T Opposite', g: 'T' },
-    { n: 'Sune', g: 'S' }, { n: 'Anti-Sune', g: 'S' }, { n: 'Sledge', g: 'S' }, { n: 'Hedge', g: 'S' },
-    { n: 'Back Sune', g: 'S' }, { n: 'Back Anti-Sune', g: 'S' },
-    { n: 'Ua', g: 'U' }, { n: 'Ub', g: 'U' }, { n: 'U', g: 'U' },
-    { n: 'U Back', g: 'U' }, { n: 'U Left', g: 'U' }, { n: 'U Right', g: 'U' },
-  ];
+  { n: 'O Adjacent', g: 'O Cases' },
+  { n: 'O Diagonal', g: 'O Cases' },
+  { n: 'H Columns', g: 'H Cases' },
+  { n: 'H Rows', g: 'H Cases' },
+  { n: 'H Column', g: 'H Cases' },
+  { n: 'H Row', g: 'H Cases' },
+  { n: 'Pi Right Bar', g: 'Pi Cases' },
+  { n: 'Pi Backslash', g: 'Pi Cases' },
+  { n: 'Pi X', g: 'Pi Cases' },
+  { n: 'Pi Forward Slash', g: 'Pi Cases' },
+  { n: 'Pi Columns', g: 'Pi Cases' },
+  { n: 'Pi Left Bar', g: 'Pi Cases' },
+  { n: 'U Forward Slash', g: 'U Cases' },
+  { n: 'U Backslash', g: 'U Cases' },
+  { n: 'U Front Row', g: 'U Cases' },
+  { n: 'U Rows', g: 'U Cases' },
+  { n: 'U X', g: 'U Cases' },
+  { n: 'U Back Row', g: 'U Cases' },
+  { n: 'T Left Bar', g: 'T Cases' },
+  { n: 'T Right Bar', g: 'T Cases' },
+  { n: 'T Rows', g: 'T Cases' },
+  { n: 'T Front Row', g: 'T Cases' },
+  { n: 'T Back Row', g: 'T Cases' },
+  { n: 'T Columns', g: 'T Cases' },
+  { n: 'S Left Bar', g: 'Sune Cases' },
+  { n: 'S X', g: 'Sune Cases' },
+  { n: 'S Forward Slash', g: 'Sune Cases' },
+  { n: 'S Columns', g: 'Sune Cases' },
+  { n: 'S Right Bar', g: 'Sune Cases' },
+  { n: 'S Backslash', g: 'Sune Cases' },
+  { n: 'AS Right Bar', g: 'Antisune Cases' },
+  { n: 'AS Columns', g: 'Antisune Cases' },
+  { n: 'AS Backslash', g: 'Antisune Cases' },
+  { n: 'AS X', g: 'Antisune Cases' },
+  { n: 'AS Forward Slash', g: 'Antisune Cases' },
+  { n: 'AS Left Bar', g: 'Antisune Cases' },
+  { n: 'L Best', g: 'L Cases' },
+  { n: 'L Good', g: 'L Cases' },
+  { n: 'L Pure', g: 'L Cases' },
+  { n: 'L Front Commutator', g: 'L Cases' },
+  { n: 'L Diagonal', g: 'L Cases' },
+  { n: 'L Back Commutator', g: 'L Cases' },
+];
 
-    // Flash colours (WCA-style red/green) — strong = downbeat, soft = off-beats
+  // Flash colours (WCA-style red/green) — strong = downbeat, soft = off-beats
   const FLASH_DOWNBEAT_COLOR = '#c8102e';
   const FLASH_DOWNBEAT_OPACITY = '0.45';
   const FLASH_OFFBEAT_COLOR = '#009b48';
@@ -949,7 +1034,7 @@ const PLL_ALGOS = [
   function spamPerMin(bpm, timeSig) { return bpm / timeSig; }
   function secondsPerSpam(bpm, timeSig) { return (60 * timeSig) / bpm; }
   function formatSpamRate(bpm, timeSig) {
-    return spamPerMin(bpm, timeSig).toFixed(1) + ' spam / min';
+    return spamPerMin(bpm, timeSig).toFixed(1) + ' spams / min';
   }
   function formatSpamDuration(bpm, timeSig) {
     const sec = secondsPerSpam(bpm, timeSig);
@@ -1305,6 +1390,16 @@ const PLL_ALGOS = [
 
 
   function caseId(type, name) { return type + ' ' + name; }
+
+  function caseDisplayLabel(id) {
+    const { type, name } = parseCaseId(id);
+    if (type === 'OLL') {
+      const o = OLL_ALGOS.find(x => x.num === name);
+      if (o) return 'OLL ' + o.num + ' – ' + o.name;
+    }
+    return type + ' · ' + name;
+  }
+
   function parseCaseId(id) {
     const space = id.indexOf(' ');
     if (space < 0) return { type: '', name: id };
@@ -1345,8 +1440,7 @@ const PLL_ALGOS = [
       el.focusStats.textContent = 'Tap to open case library';
       return;
     }
-    const { type, name } = parseCaseId(state.config.focusCase);
-    el.focusValue.textContent = type + ' · ' + name;
+    el.focusValue.textContent = caseDisplayLabel(state.config.focusCase);
     el.focusValue.classList.remove('empty');
     const rec = state.config.caseRecords[state.config.focusCase];
     el.focusStats.textContent = rec ? formatCaseRecord(rec) : 'Tap Save below after a clean drill';
@@ -1372,21 +1466,21 @@ const PLL_ALGOS = [
         '<div class="library-tick" data-action="practised" aria-label="Mark practised">' + (done ? '✓' : '') + '</div></div>';
     }
     if (filter === 'ALL' || filter === 'PLL') {
-      html += '<div class="library-divider">PLL · Permutation of Last Layer</div>';
+      html += '<div class="library-divider">PLL</div>';
       PLL_ALGOS.forEach(a => {
         const id = caseId('PLL', a.n);
         html += row(id, '<strong>' + esc(a.n) + '</strong>', '<small>' + esc(a.g) + '</small>', state.config.caseRecords[id]);
       });
     }
     if (filter === 'ALL' || filter === 'OLL') {
-      html += '<div class="library-divider">OLL · Orientation of Last Layer</div>';
+      html += '<div class="library-divider">OLL</div>';
       OLL_ALGOS.forEach(a => {
-        const id = caseId('OLL', a.n);
-        html += row(id, '<strong>OLL ' + esc(a.n) + '</strong>', '<small>' + esc(a.g) + '</small>', state.config.caseRecords[id]);
+        const id = caseId('OLL', a.num);
+        html += row(id, '<strong>OLL ' + esc(a.num) + ' – ' + esc(a.name) + '</strong>', '<small>' + esc(a.g) + '</small>', state.config.caseRecords[id]);
       });
     }
     if (filter === 'ALL' || filter === 'CMLL') {
-      html += '<div class="library-divider">CMLL · Corners of Last Layer (M-Slice Free)</div>';
+      html += '<div class="library-divider">CMLL</div>';
       CMLL_ALGOS.forEach(a => {
         const id = caseId('CMLL', a.n);
         html += row(id, '<strong>' + esc(a.n) + '</strong>', '<small>' + esc(a.g) + '</small>', state.config.caseRecords[id]);
